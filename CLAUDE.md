@@ -7,10 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start dev server (Next.js with hot reload)
-npm run build    # Production build
-npm run start    # Start production server
-npm run lint     # ESLint (flat config, no args needed)
+yarn dev             # Start dev server (Next.js with hot reload)
+yarn build           # Production build
+yarn start           # Start production server
+yarn lint            # ESLint (flat config, no args needed)
+docker compose up -d # Start MongoDB
+docker compose down  # Stop MongoDB
 ```
 
 No test framework is configured yet.
@@ -58,4 +60,4 @@ lib/                    # Domain logic — NO JSX here
 
 ## Current state
 
-The project is at **create-next-app boilerplate** — only the default page and layout exist. Phase 0 implementation has not started.
+Foundation complete: Ivory & Charcoal design system (shadcn/ui), Auth.js v5 with Credentials + Google OAuth (JWT sessions), MongoDB via Docker Compose, Mongoose singleton, register/login pages, health check endpoint. Ready for Phase 1 feature development.
