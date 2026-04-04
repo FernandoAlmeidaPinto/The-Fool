@@ -8,6 +8,7 @@ export interface IUser {
   emailVerified: Date | null;
   password?: string;
   image: string | null;
+  profileId: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +20,11 @@ const UserSchema = new Schema<IUser>(
     emailVerified: { type: Date, default: null },
     password: { type: String, select: false },
     image: { type: String, default: null },
+    profileId: {
+      type: Schema.Types.ObjectId,
+      ref: "Profile",
+      default: null,
+    },
   },
   { timestamps: true }
 );
