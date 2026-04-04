@@ -39,6 +39,7 @@ Plan {
   price: number         // in cents (e.g., 1990 = R$19.90)
   currency: string      // "BRL"
   profileId: ObjectId   // ref -> Profile
+  interval: string      // "monthly", "yearly", "one_time" — for future billing
   active: boolean       // admin can deactivate without deleting
   createdAt: Date
   updatedAt: Date
@@ -144,9 +145,10 @@ Used in Server Components, Server Actions, and Route Handlers to protect routes.
 
 ### Protection
 
-All `/admin/*` routes check permissions via `hasPermission()`. Users without `admin:profiles` or `admin:plans` are redirected to home.
+Two-level protection:
 
-The admin layout (`app/admin/layout.tsx`) wraps all admin pages and performs the permission check once.
+1. **Admin layout** (`app/admin/layout.tsx`) checks for any admin permission (`admin:profiles` OR `admin:plans` OR `admin:users`). Users with no admin permissions at all are redirected to home.
+2. **Individual pages** check their specific permission. E.g., `/admin/profiles` checks `admin:profiles`, `/admin/plans` checks `admin:plans`. If a user has `admin:plans` but not `admin:profiles`, they can access plans but get redirected from profiles.
 
 ### UI
 
