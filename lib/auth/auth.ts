@@ -66,7 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const profile = await Profile.findById(dbUser.profileId);
           if (profile) {
             token.profileSlug = profile.slug;
-            token.permissions = profile.permissions;
+            token.permissions = [...profile.permissions];
           }
         } else {
           token.profileSlug = null;
