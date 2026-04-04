@@ -6,6 +6,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { connectDB } from "@/lib/db/mongoose";
 import { User } from "@/lib/users/model";
 import { signIn, signOut } from "@/lib/auth/auth";
+import { getProfileBySlug } from "@/lib/profiles/service";
 
 export async function register(formData: FormData): Promise<void> {
   const name = formData.get("name") as string;
@@ -29,10 +30,16 @@ export async function register(formData: FormData): Promise<void> {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
+  const freeTierProfile = await getProfileBySlug("free_tier");
+  if (!freeTierProfile) {
+    throw new Error("Free tier profile not found. Run 'yarn seed' first.");
+  }
+
   await User.create({
     name,
     email,
     password: hashedPassword,
+    profileId: freeTierProfile._id,
   });
 
   // signIn throws a redirect on success (NEXT_REDIRECT).
