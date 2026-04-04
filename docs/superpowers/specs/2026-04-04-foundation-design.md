@@ -121,6 +121,14 @@ Auth.js auxiliary models (Account, Session, VerificationToken) are created autom
 
 Both pages use shadcn/ui components (Card, Input, Button, Label) styled with Ivory & Charcoal palette.
 
+### Session Strategy
+
+**Database sessions** (not JWT). Since MongoDB is available, sessions are stored in the database via the Mongoose adapter. This is the adapter's default behavior.
+
+### Account Linking
+
+When a user registers with credentials and later signs in with Google using the same email (or vice versa), accounts are **not auto-linked**. Each auth method creates a separate Account record. Auto-linking can be revisited later if user feedback warrants it.
+
 ### Auth Flow
 
 1. **Register** → create User with hashed password → auto login
