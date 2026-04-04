@@ -57,15 +57,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({ token, user, trigger }) {
+      if (user || trigger === "update") {
+        await connectDB();
+        const dbUser = await User.findById(token.id ?? user?.id);
+        if (dbUser?.profileId) {
+          const { Profile } = await import("@/lib/profiles/model");
+          const profile = await Profile.findById(dbUser.profileId);
+          if (profile) {
+            token.profileSlug = profile.slug;
+            token.permissions = profile.permissions;
+          }
+        } else {
+          token.profileSlug = null;
+          token.permissions = [];
+        }
+        if (user) {
+          token.id = user.id;
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
+      if (session.user) {
         session.user.id = token.id as string;
+        session.user.profileSlug = token.profileSlug as string | null;
+        session.user.permissions = (token.permissions as string[]) ?? [];
       }
       return session;
     },

@@ -5,9 +5,7 @@ export function hasPermission(
   session: Session | null,
   permission: Permission
 ): boolean {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const permissions = (session?.user as any)?.permissions as string[] | undefined;
-  return permissions?.includes(permission) ?? false;
+  return session?.user?.permissions?.includes(permission) ?? false;
 }
 
 export function hasAnyPermission(
