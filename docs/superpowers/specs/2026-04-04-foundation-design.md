@@ -123,7 +123,7 @@ Both pages use shadcn/ui components (Card, Input, Button, Label) styled with Ivo
 
 ### Session Strategy
 
-**Database sessions** (not JWT). Since MongoDB is available, sessions are stored in the database via the Mongoose adapter. This is the adapter's default behavior.
+**JWT sessions**. Auth.js v5 Credentials provider does not trigger the adapter's `createSession` method, so database sessions would silently fail for email/password logins. JWT strategy works for both Credentials and OAuth flows, while the MongoDB adapter still handles user/account persistence for Google OAuth.
 
 ### Account Linking
 
