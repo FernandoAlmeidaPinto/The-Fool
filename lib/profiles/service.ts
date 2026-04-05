@@ -38,3 +38,8 @@ export async function updateProfile(
   await connectDB();
   return Profile.findByIdAndUpdate(id, data, { new: true }).lean();
 }
+
+export async function getFreeTierProfile(): Promise<IProfile | null> {
+  await connectDB();
+  return Profile.findOne({ slug: "free_tier" }).lean();
+}
