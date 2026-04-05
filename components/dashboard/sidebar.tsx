@@ -32,7 +32,7 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
   const isAdmin = ADMIN_PERMISSIONS.some((p) => permissions.includes(p));
 
   return (
-    <div className="flex flex-col gap-1 px-3 py-2">
+    <div className="flex flex-col gap-1 px-3 py-2 h-full">
       <div className="px-3 py-4 text-lg font-bold text-foreground">
         🃏 The Fool
       </div>
@@ -54,12 +54,6 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
         <SidebarItem href="/configuracoes" label="Configurações" icon={Settings} onNavigate={onNavigate} />
       </nav>
 
-      <div className="my-2 border-t border-border" />
-
-      <nav className="space-y-1">
-        <SidebarItem href="/planos" label="Planos" icon={Crown} onNavigate={onNavigate} />
-      </nav>
-
       {isAdmin && (
         <>
           <div className="my-2 border-t border-border" />
@@ -70,6 +64,13 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
           </SidebarSection>
         </>
       )}
+
+      {/* Planos — pinned to bottom */}
+      <div className="mt-auto border-t border-border pt-2">
+        <nav className="space-y-1">
+          <SidebarItem href="/planos" label="Planos" icon={Crown} onNavigate={onNavigate} />
+        </nav>
+      </div>
     </div>
   );
 }
