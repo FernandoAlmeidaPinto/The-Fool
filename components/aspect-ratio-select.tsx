@@ -24,7 +24,8 @@ export function AspectRatioSelect({ defaultValue = "2/3" }: AspectRatioSelectPro
   const [customW, setCustomW] = useState(isPreset ? "" : (defaultParts[0] ?? ""));
   const [customH, setCustomH] = useState(isPreset ? "" : (defaultParts[1] ?? ""));
 
-  const hiddenValue = mode === "preset" ? presetValue : `${customW || "2"}/${customH || "3"}`;
+  const isCustomValid = mode === "custom" && customW && customH;
+  const hiddenValue = mode === "preset" ? presetValue : (isCustomValid ? `${customW}/${customH}` : "");
 
   return (
     <div className="space-y-2">
@@ -54,6 +55,7 @@ export function AspectRatioSelect({ defaultValue = "2/3" }: AspectRatioSelectPro
           <Input
             type="number"
             min="1"
+            required
             placeholder="Largura"
             value={customW}
             onChange={(e) => setCustomW(e.target.value)}
@@ -63,6 +65,7 @@ export function AspectRatioSelect({ defaultValue = "2/3" }: AspectRatioSelectPro
           <Input
             type="number"
             min="1"
+            required
             placeholder="Altura"
             value={customH}
             onChange={(e) => setCustomH(e.target.value)}
