@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/db/mongoose";
 import { Deck } from "./model";
-import type { IDeck, ICard } from "./model";
+import type { IDeck, ICard, IAnnotation } from "./model";
 
 export async function listDecks(): Promise<IDeck[]> {
   await connectDB();
@@ -65,6 +65,60 @@ export async function updateCard(
 
   await deck.save();
   return card.toObject();
+}
+
+export async function addAnnotation(
+  deckId: string,
+  cardId: string,
+  data: { x: number; y: number; title: string; description: string }
+): Promise<IAnnotation> {
+  await connectDB();
+  const deck = await Deck.findById(deckId);
+  if (!deck) throw new Error("Deck não encontrado");
+  const card = deck.cards.id(cardId);
+  if (!card) throw new Error("Carta não encontrada");
+  const maxOrder = card.annotations?.reduce((max: number, a: any) => Math.max(max, a.order), -1) ?? -1;
+  card.annotations.push({ ...data, order: maxOrder + 1 } as any);
+  await deck.save();
+  return card.annotations[card.annotations.length - 1].toObject();
+}
+
+export async function updateAnnotation(
+  deckId: string,
+  cardId: string,
+  annotationId: string,
+  data: { x?: number; y?: number; title?: string; description?: string }
+): Promise<IAnnotation | null> {
+  await connectDB();
+  const deck = await Deck.findById(deckId);
+  if (!deck) return null;
+  const card = deck.cards.id(cardId);
+  if (!card) return null;
+  const annotation = card.annotations.id(annotationId);
+  if (!annotation) return null;
+  if (data.x !== undefined) annotation.x = data.x;
+  if (data.y !== undefined) annotation.y = data.y;
+  if (data.title !== undefined) annotation.title = data.title;
+  if (data.description !== undefined) annotation.description = data.description;
+  await deck.save();
+  return annotation.toObject();
+}
+
+export async function deleteAnnotation(
+  deckId: string,
+  cardId: string,
+  annotationId: string
+): Promise<boolean> {
+  await connectDB();
+  const deck = await Deck.findById(deckId);
+  if (!deck) return false;
+  const card = deck.cards.id(cardId);
+  if (!card) return false;
+  const annotation = card.annotations.id(annotationId);
+  if (!annotation) return false;
+  annotation.deleteOne();
+  await deck.save();
+  return true;
 }
 
 export async function getCardFromDeck(
