@@ -21,6 +21,11 @@ export async function createReading(data: {
 
   const { userId, deckId, cardIds, context } = data;
 
+  // Validate context
+  if (!context.trim()) {
+    throw new Error("Contexto é obrigatório");
+  }
+
   // Validate card count
   if (cardIds.length < 2 || cardIds.length > 5) {
     throw new Error("Selecione entre 2 e 5 cartas");
