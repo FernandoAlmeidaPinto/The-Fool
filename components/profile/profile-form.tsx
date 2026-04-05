@@ -93,6 +93,7 @@ export function ProfileForm({ user, plan }: ProfileFormProps) {
                 aspectRatio={1}
                 currentImage={user.avatar}
                 label="Foto de perfil"
+                circular
               />
             </div>
           </div>

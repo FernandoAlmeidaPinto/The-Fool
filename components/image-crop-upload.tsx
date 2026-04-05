@@ -12,6 +12,7 @@ interface ImageCropUploadProps {
   required?: boolean;
   currentImage?: string | null;
   label?: string;
+  circular?: boolean;
 }
 
 export function ImageCropUpload({
@@ -20,6 +21,7 @@ export function ImageCropUpload({
   required = false,
   currentImage = null,
   label = "Imagem",
+  circular = false,
 }: ImageCropUploadProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
@@ -122,13 +124,13 @@ export function ImageCropUpload({
       {imageSrc && !croppedPreview && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">Ajuste a área de corte e clique em &quot;Recortar&quot;.</p>
-          <div className="max-w-lg border border-border rounded-md overflow-hidden">
+          <div className={`max-w-lg border border-border rounded-md overflow-hidden ${circular ? "[&_.cropper-view-box]:rounded-full [&_.cropper-face]:rounded-full" : ""}`}>
             <Cropper
               ref={cropperRef}
               src={imageSrc}
               style={{ height: 400, width: "100%" }}
               aspectRatio={aspectRatio}
-              guides={true}
+              guides={!circular}
               viewMode={1}
               minCropBoxHeight={50}
               minCropBoxWidth={50}
@@ -155,7 +157,7 @@ export function ImageCropUpload({
           <img
             src={croppedPreview}
             alt="Preview recortado"
-            className="max-w-xs max-h-64 rounded-md border border-border object-contain"
+            className={`max-w-xs max-h-64 border border-border object-contain ${circular ? "rounded-full" : "rounded-md"}`}
           />
           <Button type="button" variant="outline" size="sm" onClick={reset}>
             Escolher outra imagem

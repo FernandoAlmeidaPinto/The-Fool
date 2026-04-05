@@ -5,6 +5,7 @@ import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
 import { PageTitle } from "@/components/dashboard/page-title";
 import { logout } from "@/lib/auth/auth-actions";
 import { Button } from "@/components/ui/button";
+import { getUserById } from "@/lib/users/service";
 
 export default async function DashboardLayout({
   children,
@@ -16,6 +17,15 @@ export default async function DashboardLayout({
   if (!session?.user) {
     redirect("/auth/login");
   }
+
+  const user = await getUserById(session.user.id);
+  const avatarUrl = user?.avatar ?? null;
+  const initials = session.user.name
+    .split(" ")
+    .map((w: string) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -32,6 +42,17 @@ export default async function DashboardLayout({
             <PageTitle />
           </div>
           <div className="flex items-center gap-3">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={session.user.name}
+                className="h-7 w-7 rounded-full object-cover border border-border"
+              />
+            ) : (
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-muted-foreground border border-border">
+                {initials}
+              </div>
+            )}
             <span className="text-sm text-muted-foreground">{session.user.name}</span>
             <form action={logout}>
               <Button variant="ghost" size="sm" type="submit">

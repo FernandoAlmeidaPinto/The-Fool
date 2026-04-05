@@ -42,7 +42,9 @@ export async function updateProfileAction(
       .toBuffer();
 
     const key = `users/avatars/${session.user.id}.jpg`;
-    data.avatar = await uploadFile(processedBuffer, key, "image/jpeg");
+    const url = await uploadFile(processedBuffer, key, "image/jpeg");
+    // Append timestamp to bust browser cache (same key is reused)
+    data.avatar = `${url}?t=${Date.now()}`;
   }
 
   try {
