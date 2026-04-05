@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { addAnnotation, updateAnnotation, deleteAnnotation } from "@/lib/decks/service";
+import { sanitizeHtml } from "@/lib/html/sanitize";
 import { revalidatePath } from "next/cache";
 
 async function requireDecksPermission() {
@@ -23,7 +24,7 @@ export async function createAnnotationAction(data: {
 }) {
   await requireDecksPermission();
   const annotation = await addAnnotation(data.deckId, data.cardId, {
-    x: data.x, y: data.y, title: data.title, description: data.description,
+    x: data.x, y: data.y, title: data.title, description: sanitizeHtml(data.description),
   });
   revalidatePath(`/admin/decks/${data.deckId}/cards/${data.cardId}/annotations`);
   revalidatePath(`/baralhos/${data.deckId}/carta/${data.cardId}`);
@@ -48,7 +49,7 @@ export async function updateAnnotationAction(data: {
 }) {
   await requireDecksPermission();
   const annotation = await updateAnnotation(data.deckId, data.cardId, data.annotationId, {
-    x: data.x, y: data.y, title: data.title, description: data.description,
+    x: data.x, y: data.y, title: data.title, description: data.description ? sanitizeHtml(data.description) : data.description,
   });
   revalidatePath(`/admin/decks/${data.deckId}/cards/${data.cardId}/annotations`);
   revalidatePath(`/baralhos/${data.deckId}/carta/${data.cardId}`);

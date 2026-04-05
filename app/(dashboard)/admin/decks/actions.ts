@@ -7,6 +7,7 @@ import { PERMISSIONS } from "@/lib/permissions/constants";
 import { createDeck, updateDeck, addCard, updateCard, getDeckById } from "@/lib/decks/service";
 import { uploadFile, validateImage, processCardImage } from "@/lib/storage/s3";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { sanitizeHtml } from "@/lib/html/sanitize";
 import { redirect } from "next/navigation";
 
 async function requireDecksPermission() {
@@ -43,7 +44,7 @@ export async function createDeckAction(formData: FormData) {
     coverImage = await uploadFile(processedBuffer, key, "image/jpeg");
   }
 
-  await createDeck({ name, description: description ?? "", type, cardAspectRatio: aspectRatio, coverImage });
+  await createDeck({ name, description: sanitizeHtml(description ?? ""), type, cardAspectRatio: aspectRatio, coverImage });
   redirect("/admin/decks");
 }
 
@@ -62,7 +63,7 @@ export async function updateDeckAction(formData: FormData) {
   }
 
   const updateData: Parameters<typeof updateDeck>[1] = {
-    name, description: description ?? "", type, cardAspectRatio: aspectRatio,
+    name, description: sanitizeHtml(description ?? ""), type, cardAspectRatio: aspectRatio,
   };
 
   if (coverFile && coverFile.size > 0) {
@@ -106,7 +107,7 @@ export async function addCardAction(formData: FormData) {
   const processedBuffer = await processCardImage(rawBuffer, width, height);
   const imageUrl = await uploadFile(processedBuffer, key, "image/jpeg");
 
-  await addCard(deckId, { title, description: description ?? "", image: imageUrl });
+  await addCard(deckId, { title, description: sanitizeHtml(description ?? ""), image: imageUrl });
   redirect(`/admin/decks/${deckId}/edit`);
 }
 
@@ -125,7 +126,7 @@ export async function updateCardAction(formData: FormData) {
 
   const data: { title: string; description: string; image?: string } = {
     title,
-    description: description ?? "",
+    description: sanitizeHtml(description ?? ""),
   };
 
   if (file && file.size > 0) {
