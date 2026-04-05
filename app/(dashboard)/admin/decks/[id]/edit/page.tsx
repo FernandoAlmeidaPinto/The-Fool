@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { CardThumbnail } from "@/components/card-thumbnail";
 import Link from "next/link";
 import { updateDeckAction } from "../../actions";
-import Image from "next/image";
 
 export default async function EditDeckPage({
   params,
@@ -82,20 +82,12 @@ export default async function EditDeckPage({
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {sortedCards.map((card) => (
-              <Link
+              <CardThumbnail
                 key={card._id.toString()}
                 href={`/admin/decks/${deck._id}/cards/${card._id}/edit`}
-                className="group"
-              >
-                <div className="aspect-[2/3] max-h-96 relative overflow-hidden rounded-md border bg-muted">
-                  <img
-                    src={card.image ?? ""}
-                    alt={card.title}
-                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  />
-                </div>
-                <p className="mt-2 text-sm font-medium text-center">{card.title}</p>
-              </Link>
+                title={card.title}
+                image={card.image ?? null}
+              />
             ))}
           </div>
         )}
