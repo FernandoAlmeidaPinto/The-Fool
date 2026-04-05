@@ -93,3 +93,17 @@ export async function cancelSubscription(
 
   return true;
 }
+
+/**
+ * Get active subscriptions for multiple users in one query.
+ */
+export async function getActiveSubscriptionsByUserIds(
+  userIds: string[]
+): Promise<ISubscription[]> {
+  await connectDB();
+  return Subscription.find({
+    userId: { $in: userIds },
+    status: "active",
+    renewsAt: { $gt: new Date() },
+  }).lean();
+}
