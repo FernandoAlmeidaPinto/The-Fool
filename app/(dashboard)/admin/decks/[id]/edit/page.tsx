@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CardThumbnail } from "@/components/card-thumbnail";
 import Link from "next/link";
 import { updateDeckAction } from "../../actions";
@@ -44,8 +45,8 @@ export default async function EditDeckPage({
               <Input id="name" name="name" defaultValue={deck.name} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Input id="description" name="description" defaultValue={deck.description} />
+              <Label>Descrição</Label>
+              <RichTextEditor content={deck.description} name="description" placeholder="Descrição do baralho" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="type">Tipo</Label>

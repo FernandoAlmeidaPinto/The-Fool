@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { createDeckAction } from "../actions";
 
 export default async function NewDeckPage() {
@@ -30,8 +31,8 @@ export default async function NewDeckPage() {
             <Input id="name" name="name" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Input id="description" name="description" />
+            <Label>Descrição</Label>
+            <RichTextEditor content="" name="description" placeholder="Descrição do baralho" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Tipo</Label>
