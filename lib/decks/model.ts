@@ -14,7 +14,7 @@ const AnnotationSchema = new Schema<IAnnotation>({
   x: { type: Number, required: true, min: 0, max: 100 },
   y: { type: Number, required: true, min: 0, max: 100 },
   title: { type: String, required: true, maxlength: 80 },
-  description: { type: String, default: "", maxlength: 500 },
+  description: { type: String, default: "", maxlength: 2000 },
   order: { type: Number, required: true, default: 0 },
 });
 
