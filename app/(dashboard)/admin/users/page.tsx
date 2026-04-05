@@ -34,7 +34,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
 
   // Batch resolve profiles
   await connectDB();
-  const profileIds = [...new Set(users.map((u) => u.profileId?.toString()).filter(Boolean))];
+  const profileIds = [...new Set(users.map((u) => u.profileId?.toString()).filter((id): id is string => Boolean(id)))];
   const profiles = profileIds.length > 0
     ? await Profile.find({ _id: { $in: profileIds } }).lean()
     : [];
