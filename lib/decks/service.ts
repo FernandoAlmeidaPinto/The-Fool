@@ -77,8 +77,8 @@ export async function addAnnotation(
   if (!deck) throw new Error("Deck não encontrado");
   const card = deck.cards.id(cardId);
   if (!card) throw new Error("Carta não encontrada");
-  const maxOrder = card.annotations?.reduce((max: number, a: any) => Math.max(max, a.order), -1) ?? -1;
-  card.annotations.push({ ...data, order: maxOrder + 1 } as any);
+  const maxOrder = card.annotations?.reduce((max: number, a: IAnnotation) => Math.max(max, a.order), -1) ?? -1;
+  card.annotations.push({ ...data, order: maxOrder + 1 } as IAnnotation);
   await deck.save();
   return card.annotations[card.annotations.length - 1].toObject();
 }

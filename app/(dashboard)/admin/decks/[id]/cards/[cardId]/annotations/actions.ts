@@ -27,7 +27,14 @@ export async function createAnnotationAction(data: {
   });
   revalidatePath(`/admin/decks/${data.deckId}/cards/${data.cardId}/annotations`);
   revalidatePath(`/baralhos/${data.deckId}/carta/${data.cardId}`);
-  return annotation;
+  return {
+    _id: annotation._id.toString(),
+    x: annotation.x,
+    y: annotation.y,
+    title: annotation.title,
+    description: annotation.description,
+    order: annotation.order,
+  };
 }
 
 export async function updateAnnotationAction(data: {
@@ -45,7 +52,15 @@ export async function updateAnnotationAction(data: {
   });
   revalidatePath(`/admin/decks/${data.deckId}/cards/${data.cardId}/annotations`);
   revalidatePath(`/baralhos/${data.deckId}/carta/${data.cardId}`);
-  return annotation;
+  if (!annotation) return null;
+  return {
+    _id: annotation._id.toString(),
+    x: annotation.x,
+    y: annotation.y,
+    title: annotation.title,
+    description: annotation.description,
+    order: annotation.order,
+  };
 }
 
 export async function deleteAnnotationAction(data: {

@@ -42,15 +42,11 @@ export function CardAnnotationsViewer({
 
   const titleRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
-  if (annotations.length === 0) return null;
+  const [titlePositions, setTitlePositions] = useState<
+    Map<string, { x: number; y: number }>
+  >(new Map());
 
-  const sorted = [...annotations].sort((a, b) => a.order - b.order);
-
-  const leftAnnotations = sorted.filter((a) => a.x <= 50);
-  const rightAnnotations = sorted.filter((a) => a.x > 50);
-
-  // Measure container and image for SVG line calculations
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Measure container, image, and title positions for SVG line calculations
   useEffect(() => {
     const measure = () => {
       const container = containerRef.current;
@@ -68,19 +64,32 @@ export function CardAnnotationsViewer({
         imageWidth: iRect.width,
         imageHeight: iRect.height,
       });
+
+      // Measure title positions in the same callback
+      const newPositions = new Map<string, { x: number; y: number }>();
+      titleRefs.current.forEach((el, id) => {
+        const tRect = el.getBoundingClientRect();
+        newPositions.set(id, {
+          x: tRect.left - cRect.left + tRect.width / 2,
+          y: tRect.top - cRect.top + tRect.height / 2,
+        });
+      });
+      setTitlePositions(newPositions);
     };
 
-    measure();
+    // Delay initial measure to allow title elements to render
+    const raf = requestAnimationFrame(measure);
 
     const observer = new ResizeObserver(measure);
     if (containerRef.current) observer.observe(containerRef.current);
 
     window.addEventListener("resize", measure);
     return () => {
+      cancelAnimationFrame(raf);
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [annotations]);
 
   const getDotPosition = useCallback(
     (annotation: Annotation) => {
@@ -93,21 +102,9 @@ export function CardAnnotationsViewer({
     [dimensions]
   );
 
-  const getTitleCenter = useCallback((id: string) => {
-    const el = titleRefs.current.get(id);
-    const container = containerRef.current;
-    if (!el || !container) return null;
-    const cRect = container.getBoundingClientRect();
-    const tRect = el.getBoundingClientRect();
-    return {
-      x: tRect.left - cRect.left + tRect.width / 2,
-      y: tRect.top - cRect.top + tRect.height / 2,
-    };
-  }, []);
-
   // Distribute titles vertically to avoid overlap
   const distributeVertically = useCallback(
-    (anns: Annotation[], side: "left" | "right") => {
+    (anns: Annotation[]) => {
       if (!dimensions) return anns.map(() => 50);
 
       const minGap = 40; // minimum px between title centers
@@ -132,8 +129,14 @@ export function CardAnnotationsViewer({
     [dimensions]
   );
 
-  const leftPositions = distributeVertically(leftAnnotations, "left");
-  const rightPositions = distributeVertically(rightAnnotations, "right");
+  if (annotations.length === 0) return null;
+
+  const sorted = [...annotations].sort((a, b) => a.order - b.order);
+  const leftAnnotations = sorted.filter((a) => a.x <= 50);
+  const rightAnnotations = sorted.filter((a) => a.x > 50);
+
+  const leftPositions = distributeVertically(leftAnnotations);
+  const rightPositions = distributeVertically(rightAnnotations);
 
   return (
     <>
@@ -266,7 +269,7 @@ export function CardAnnotationsViewer({
             >
               {sorted.map((ann) => {
                 const dot = getDotPosition(ann);
-                const title = getTitleCenter(ann._id);
+                const title = titlePositions.get(ann._id);
                 if (!title) return null;
                 const isActive = activeId === ann._id;
                 return (

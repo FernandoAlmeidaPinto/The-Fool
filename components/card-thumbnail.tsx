@@ -11,14 +11,14 @@ export function CardThumbnail({ href, title, image, aspectRatio = "2/3" }: CardT
   return (
     <Link href={href} className="group flex flex-col gap-2">
       <div
-        className="max-h-96 relative overflow-hidden rounded-md border border-border bg-muted"
+        className="max-h-96 relative overflow-hidden rounded-md"
         style={{ aspectRatio }}
       >
         {image ? (
           <img
             src={image}
             alt={title}
-            className="object-contain w-full h-full transition-transform group-hover:scale-105"
+            className="object-contain w-full h-full opacity-80 transition-transform group-hover:opacity-100"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-sm text-muted-foreground">

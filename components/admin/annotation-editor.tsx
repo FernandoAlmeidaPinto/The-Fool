@@ -28,7 +28,7 @@ interface AnnotationEditorProps {
     y: number;
     title: string;
     description: string;
-  }) => Promise<any>;
+  }) => Promise<AnnotationData>;
   updateAction: (data: {
     deckId: string;
     cardId: string;
@@ -37,7 +37,7 @@ interface AnnotationEditorProps {
     y?: number;
     title?: string;
     description?: string;
-  }) => Promise<any>;
+  }) => Promise<AnnotationData | null>;
   deleteAction: (data: {
     deckId: string;
     cardId: string;

@@ -17,7 +17,7 @@ export default async function CardDetailPage({ params }: Props) {
 
   const { deck, card, prevCard, nextCard } = result;
 
-  const annotations = ((card as any).annotations ?? []).map((a: any) => ({
+  const annotations = (card.annotations ?? []).map((a: { _id: { toString(): string }; x: number; y: number; title: string; description: string; order: number }) => ({
     _id: a._id.toString(),
     x: a.x,
     y: a.y,
