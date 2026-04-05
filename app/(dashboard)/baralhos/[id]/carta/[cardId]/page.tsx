@@ -4,6 +4,7 @@ import { getCardFromDeck } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CardAnnotationsViewer } from "@/components/card-annotations-viewer";
+import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 
 interface Props {
   params: Promise<{ id: string; cardId: string }>;
@@ -67,9 +68,7 @@ export default async function CardDetailPage({ params }: Props) {
         <h2 className="text-2xl font-semibold text-center">{card.title}</h2>
 
         {card.description && (
-          <p className="text-muted-foreground text-center whitespace-pre-wrap">
-            {card.description}
-          </p>
+          <RichTextViewer content={card.description} className="text-muted-foreground text-center" />
         )}
       </div>
 

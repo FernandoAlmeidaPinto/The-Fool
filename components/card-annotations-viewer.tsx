@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
+import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 
 interface Annotation {
   _id: string;
@@ -186,7 +187,7 @@ export function CardAnnotationsViewer({
                   {ann.title}
                   {activeId === ann._id && ann.description && (
                     <span className="mt-1 block rounded bg-gray-900 px-2 py-1 text-left text-[11px] font-normal leading-snug text-white shadow-lg">
-                      {ann.description}
+                      <RichTextViewer content={ann.description} className="[&_p]:mb-1 [&_p:last-child]:mb-0" />
                     </span>
                   )}
                 </button>
@@ -253,7 +254,7 @@ export function CardAnnotationsViewer({
                   {ann.title}
                   {activeId === ann._id && ann.description && (
                     <span className="mt-1 block rounded bg-gray-900 px-2 py-1 text-left text-[11px] font-normal leading-snug text-white shadow-lg">
-                      {ann.description}
+                      <RichTextViewer content={ann.description} className="[&_p]:mb-1 [&_p:last-child]:mb-0" />
                     </span>
                   )}
                 </button>
@@ -344,9 +345,7 @@ export function CardAnnotationsViewer({
                   <div>
                     <h3 className="text-sm font-semibold">{ann.title}</h3>
                     {ann.description && (
-                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
-                        {ann.description}
-                      </p>
+                      <RichTextViewer content={ann.description} className="mt-1 text-sm text-muted-foreground" />
                     )}
                   </div>
                 </div>

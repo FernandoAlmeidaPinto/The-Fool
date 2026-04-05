@@ -3,6 +3,7 @@ import { getDeckById } from "@/lib/decks/service";
 import { DECK_TYPE_LABELS, DeckType, parseAspectRatio } from "@/lib/decks/constants";
 import { Badge } from "@/components/ui/badge";
 import { CardThumbnail } from "@/components/card-thumbnail";
+import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -26,7 +27,7 @@ export default async function DeckPage({ params }: Props) {
           </Badge>
         </div>
         {deck.description && (
-          <p className="text-muted-foreground">{deck.description}</p>
+          <RichTextViewer content={deck.description} className="text-muted-foreground" />
         )}
       </div>
 
