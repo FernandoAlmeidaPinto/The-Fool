@@ -29,6 +29,8 @@ Annotation {
 
 Coordinates are **percentages**, not pixels — independent of rendered image size. A click at the center of the image saves `x: 50, y: 50`.
 
+**Validation:** x and y must be between 0 and 100 (reject out-of-range values in the service layer). Title max 80 characters. Description max 500 characters.
+
 ### Card (modify existing)
 
 Add `annotations` field:
@@ -185,4 +187,4 @@ All UI text in Portuguese: "Anotações", "Adicionar Anotação", "Título", "De
 - Drag-and-drop point repositioning (admin re-clicks to reposition)
 - Complex line animations
 - Export/import annotations
-- Annotation ordering UI (uses creation order)
+- Annotation reorder UI (uses creation order; future enhancement if pedagogical order needed)
