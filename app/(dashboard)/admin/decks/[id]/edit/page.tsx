@@ -3,6 +3,7 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect, notFound } from "next/navigation";
 import { getDeckById } from "@/lib/decks/service";
+import { countPendingCombinations } from "@/lib/readings/service";
 import { DECK_TYPES, DECK_TYPE_LABELS, parseAspectRatio } from "@/lib/decks/constants";
 import { AspectRatioSelect } from "@/components/aspect-ratio-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,8 @@ export default async function EditDeckPage({
   const { id } = await params;
   const deck = await getDeckById(id);
   if (!deck) notFound();
+
+  const pendingCombinations = await countPendingCombinations(id);
 
   const deckTypes = Object.values(DECK_TYPES);
   const sortedCards = [...deck.cards].sort((a, b) => a.order - b.order);
@@ -105,6 +108,21 @@ export default async function EditDeckPage({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Combinations link */}
+      <div className="flex items-center gap-3">
+        <Link
+          href={`/admin/decks/${id}/combinacoes`}
+          className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          Gerenciar Combinações
+          {pendingCombinations > 0 && (
+            <span className="ml-1 inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-semibold text-yellow-800">
+              {pendingCombinations} pendente{pendingCombinations > 1 ? "s" : ""}
+            </span>
+          )}
+        </Link>
       </div>
     </div>
   );
