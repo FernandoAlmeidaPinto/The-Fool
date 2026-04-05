@@ -14,11 +14,20 @@ export async function updateProfileAction(
   }
 
   const name = formData.get("name") as string;
+  const avatarEntry = formData.get("avatar");
+  const birthDateRaw = formData.get("birthDate");
+  console.log("[updateProfile] form fields:", {
+    name,
+    birthDate: birthDateRaw,
+    avatarType: avatarEntry?.constructor?.name,
+    avatarSize: avatarEntry instanceof File ? avatarEntry.size : "not a file",
+  });
+
   if (!name?.trim()) {
     return { success: false, error: "Nome é obrigatório" };
   }
 
-  const birthDateStr = formData.get("birthDate") as string;
+  const birthDateStr = birthDateRaw as string;
   const birthDate = birthDateStr ? new Date(birthDateStr) : null;
 
   const data: { name: string; birthDate: Date | null; avatar?: string } = {
@@ -48,10 +57,17 @@ export async function updateProfileAction(
   }
 
   try {
-    await updateUser(session.user.id, data);
+    console.log("[updateProfile] userId:", session.user.id);
+    console.log("[updateProfile] data:", JSON.stringify(data, null, 2));
+    const result = await updateUser(session.user.id, data);
+    console.log("[updateProfile] result:", result ? "updated" : "user not found");
+    if (!result) {
+      return { success: false, error: "Usuário não encontrado" };
+    }
     revalidatePath("/perfil");
     return { success: true };
   } catch (err) {
+    console.error("[updateProfile] error:", err);
     return { success: false, error: err instanceof Error ? err.message : "Erro ao salvar" };
   }
 }
