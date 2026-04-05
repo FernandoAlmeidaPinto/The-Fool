@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ImageCropUpload } from "@/components/image-crop-upload";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { addCardAction } from "../../../actions";
 
 export default async function NewCardPage({
@@ -42,13 +43,8 @@ export default async function NewCardPage({
             <Input id="title" name="title" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
-              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            />
+            <Label>Descrição</Label>
+            <RichTextEditor content="" name="description" placeholder="Descrição da carta" />
           </div>
           <ImageCropUpload
             name="image"
