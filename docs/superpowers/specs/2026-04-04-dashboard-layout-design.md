@@ -66,7 +66,7 @@ Admin ▼                           ← Accordion (only if has admin:* permissio
 ### Behavior
 
 - Active item: highlighted with `primary` background and `primary-foreground` text
-- "Admin" section: accordion (expand/collapse), state persisted in localStorage
+- "Admin" section: accordion (expand/collapse), state persisted in localStorage, collapsed by default on first visit
 - "Admin" section: only visible if user has any `admin:*` permission
 - Separator lines between main nav, "Conta" section, and "Admin" section
 
@@ -114,6 +114,9 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/plans": "Planos",
   "/admin/plans/new": "Novo Plano",
 };
+// Dynamic routes: /admin/profiles/[id]/edit → "Editar Perfil"
+// Dynamic routes: /admin/plans/[id]/edit → "Editar Plano"
+// Fallback for unmatched routes: "Dashboard"
 ```
 
 Falls back to "Dashboard" for unknown routes.
@@ -129,8 +132,8 @@ Falls back to "Dashboard" for unknown routes.
 | `app/page.tsx` | `app/(dashboard)/page.tsx` (simplified — remove logout button, welcome only) |
 | `app/admin/layout.tsx` | Removed (sidebar replaces it) |
 | `app/admin/page.tsx` | `app/(dashboard)/admin/page.tsx` |
-| `app/admin/profiles/*` | `app/(dashboard)/admin/profiles/*` |
-| `app/admin/plans/*` | `app/(dashboard)/admin/plans/*` |
+| `app/admin/profiles/*` (incl. actions.ts, [id]/edit/) | `app/(dashboard)/admin/profiles/*` |
+| `app/admin/plans/*` (incl. actions.ts, [id]/edit/) | `app/(dashboard)/admin/plans/*` |
 
 ### What stays
 
