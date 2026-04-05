@@ -40,7 +40,7 @@ export default async function DeckPage({ params }: Props) {
               href={`/baralhos/${id}/carta/${card._id.toString()}`}
               className="group flex flex-col gap-2"
             >
-              <div className="relative w-full aspect-[2/3] rounded-md overflow-hidden bg-muted">
+              <div className="relative w-full aspect-[2/3] max-h-96 rounded-md overflow-hidden bg-muted">
                 {card.image ? (
                   <img
                     src={card.image}

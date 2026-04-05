@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { updateDeckAction } from "../../actions";
+import Image from "next/image";
 
 export default async function EditDeckPage({
   params,
@@ -86,9 +87,9 @@ export default async function EditDeckPage({
                 href={`/admin/decks/${deck._id}/cards/${card._id}/edit`}
                 className="group"
               >
-                <div className="aspect-[2/3] overflow-hidden rounded-md border bg-muted">
+                <div className="aspect-[2/3] max-h-96 relative overflow-hidden rounded-md border bg-muted">
                   <img
-                    src={card.image}
+                    src={card.image ?? ""}
                     alt={card.title}
                     className="h-full w-full object-cover transition-transform group-hover:scale-105"
                   />

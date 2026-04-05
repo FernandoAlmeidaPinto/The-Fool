@@ -26,7 +26,7 @@ export default async function CardDetailPage({ params }: Props) {
       </Link>
 
       <div className="flex flex-col items-center gap-4">
-        <div className="relative w-full max-w-sm aspect-[2/3] rounded-lg overflow-hidden bg-muted shadow-md">
+        <div className="relative w-full max-w-sm aspect-[2/3] max-h-96 rounded-lg overflow-hidden bg-muted shadow-md">
           {card.image ? (
             <img
               src={card.image}
