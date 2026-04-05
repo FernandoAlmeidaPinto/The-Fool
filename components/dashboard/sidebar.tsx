@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Sparkles,
   BookOpen,
+  Layers,
   User,
   Settings,
   Shield,
@@ -17,6 +18,7 @@ const ADMIN_PERMISSIONS = [
   "admin:profiles",
   "admin:plans",
   "admin:users",
+  "admin:decks",
 ];
 
 interface SidebarContentProps {
@@ -38,6 +40,7 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
         <SidebarItem href="/" label="Dashboard" icon={LayoutDashboard} onNavigate={onNavigate} />
         <SidebarItem href="/leituras" label="Leituras" icon={Sparkles} onNavigate={onNavigate} />
         <SidebarItem href="/cursos" label="Cursos" icon={BookOpen} onNavigate={onNavigate} />
+        <SidebarItem href="/baralhos" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
       </nav>
 
       <div className="my-2 border-t border-border" />
@@ -56,6 +59,7 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
           <SidebarSection label="Admin" storageKey="sidebar-admin-open" defaultOpen={false}>
             <SidebarItem href="/admin/profiles" label="Perfis" icon={Shield} onNavigate={onNavigate} />
             <SidebarItem href="/admin/plans" label="Planos" icon={CreditCard} onNavigate={onNavigate} />
+            <SidebarItem href="/admin/decks" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
           </SidebarSection>
         </>
       )}
