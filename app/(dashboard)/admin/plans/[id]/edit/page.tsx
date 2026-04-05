@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { updatePlanAction } from "../../actions";
 
 export default async function EditPlanPage({
@@ -41,8 +42,8 @@ export default async function EditPlanPage({
             <Input id="name" name="name" defaultValue={plan.name} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Input id="description" name="description" defaultValue={plan.description} />
+            <Label>Description</Label>
+            <RichTextEditor content={plan.description} name="description" placeholder="Descrição do plano" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="price">Price (R$)</Label>

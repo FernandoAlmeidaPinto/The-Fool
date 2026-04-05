@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { createPlan, updatePlan, togglePlanActive } from "@/lib/plans/service";
+import { sanitizeHtml } from "@/lib/html/sanitize";
 import { redirect } from "next/navigation";
 
 async function requirePlansPermission() {
@@ -31,7 +32,7 @@ export async function createPlanAction(formData: FormData) {
 
   await createPlan({
     name,
-    description: description ?? "",
+    description: sanitizeHtml(description ?? ""),
     price,
     currency: currency || "BRL",
     interval: interval || "monthly",
@@ -60,7 +61,7 @@ export async function updatePlanAction(formData: FormData) {
 
   await updatePlan(id, {
     name,
-    description: description ?? "",
+    description: sanitizeHtml(description ?? ""),
     price,
     currency: currency || "BRL",
     interval: interval || "monthly",

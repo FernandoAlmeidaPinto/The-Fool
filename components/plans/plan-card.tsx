@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { subscribeToPlanAction, cancelSubscriptionAction } from "@/app/(dashboard)/planos/actions";
+import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 import { useRouter } from "next/navigation";
 
 interface PlanCardProps {
@@ -75,7 +76,7 @@ export function PlanCard({ plan, isCurrent, hasSubscription }: PlanCardProps) {
           )}
           <h3 className="text-lg font-semibold">{plan.name}</h3>
           {plan.description && (
-            <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
+            <RichTextViewer content={plan.description} className="text-sm text-muted-foreground mt-1" />
           )}
         </div>
 
