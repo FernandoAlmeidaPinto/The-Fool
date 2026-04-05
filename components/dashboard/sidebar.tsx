@@ -7,6 +7,7 @@ import {
   BookOpen,
   Layers,
   User,
+  Users,
   Settings,
   Shield,
   CreditCard,
@@ -61,6 +62,7 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
             <SidebarItem href="/admin/profiles" label="Perfis" icon={Shield} onNavigate={onNavigate} />
             <SidebarItem href="/admin/plans" label="Planos" icon={CreditCard} onNavigate={onNavigate} />
             <SidebarItem href="/admin/decks" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
+            <SidebarItem href="/admin/users" label="Usuários" icon={Users} onNavigate={onNavigate} />
           </SidebarSection>
         </>
       )}
