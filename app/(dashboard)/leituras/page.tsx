@@ -70,7 +70,7 @@ export default async function LeiturasPage({ searchParams }: Props) {
   return (
     <div>
       {/* Header with quota */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h2 className="text-2xl font-semibold text-foreground">Leituras</h2>
         {canCreate && (
           <div className="flex items-center gap-3">
@@ -92,6 +92,10 @@ export default async function LeiturasPage({ searchParams }: Props) {
           </div>
         )}
       </div>
+
+      <p className="text-sm text-muted-foreground mb-6">
+        As leituras aqui são exercícios de aprendizado. O objetivo é ajudar você a desenvolver vocabulário interpretativo e compreender as relações entre as cartas — não substituem uma consulta real.
+      </p>
 
       {/* Reading history */}
       {readings.length === 0 ? (
