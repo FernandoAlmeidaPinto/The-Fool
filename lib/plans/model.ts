@@ -10,6 +10,7 @@ export interface IPlan {
   interval: string;
   profileId: mongoose.Types.ObjectId;
   active: boolean;
+  readingsMonthlyLimit: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +32,7 @@ const PlanSchema = new Schema<IPlan>(
       required: true,
     },
     active: { type: Boolean, default: true },
+    readingsMonthlyLimit: { type: Number, default: null },
   },
   { timestamps: true }
 );

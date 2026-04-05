@@ -14,7 +14,6 @@ async function seed() {
       slug: "admin",
       description: "Full platform access",
       permissions: ALL_PERMISSIONS,
-      readingsMonthlyLimit: null,
     },
     { upsert: true, new: true }
   );
@@ -27,7 +26,6 @@ async function seed() {
       slug: "free_tier",
       description: "Basic free access",
       permissions: [PERMISSIONS.READINGS_VIEW, PERMISSIONS.READINGS_CREATE],
-      readingsMonthlyLimit: 5,
     },
     { upsert: true, new: true }
   );
