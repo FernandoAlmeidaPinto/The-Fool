@@ -1,6 +1,9 @@
 import { connectDB } from "@/lib/db/mongoose";
 import { UserInterpretation } from "./interpretation-model";
 import { getActiveSubscription } from "@/lib/subscriptions/service";
+import { Plan } from "@/lib/plans/model";
+
+const FREE_TIER_READINGS_LIMIT = 5;
 
 /**
  * Count user readings within a date range.
@@ -18,25 +21,41 @@ async function countReadingsInRange(
 }
 
 /**
+ * Get the readings monthly limit for a user.
+ * If subscribed: from the plan. If not: FREE_TIER_READINGS_LIMIT.
+ */
+async function getReadingsLimit(
+  userId: string
+): Promise<{ limit: number | null; subscription: Awaited<ReturnType<typeof getActiveSubscription>> }> {
+  const subscription = await getActiveSubscription(userId);
+
+  if (subscription) {
+    await connectDB();
+    const plan = await Plan.findById(subscription.planId).lean();
+    return { limit: plan?.readingsMonthlyLimit ?? null, subscription };
+  }
+
+  return { limit: FREE_TIER_READINGS_LIMIT, subscription: null };
+}
+
+/**
  * Check if user can create a new reading.
- * Uses subscription cycle dates if available, otherwise calendar month.
+ * Self-resolves the limit from the user's subscription plan.
  * Returns { allowed, used, limit, cycleEnd } for quota display.
  */
 export async function checkReadingQuota(
-  userId: string,
-  readingsMonthlyLimit: number | null
+  userId: string
 ): Promise<{
   allowed: boolean;
   used: number;
   limit: number | null;
   cycleEnd: Date | null;
 }> {
-  if (readingsMonthlyLimit === null) {
+  const { limit, subscription } = await getReadingsLimit(userId);
+
+  if (limit === null) {
     return { allowed: true, used: 0, limit: null, cycleEnd: null };
   }
-
-  // Try to use subscription cycle dates
-  const subscription = await getActiveSubscription(userId);
 
   let from: Date;
   let to: Date;
@@ -45,7 +64,7 @@ export async function checkReadingQuota(
     from = new Date(subscription.startsAt);
     to = new Date(subscription.renewsAt);
   } else {
-    // Fallback: calendar month
+    // Fallback: calendar month for free tier
     const now = new Date();
     from = new Date(now.getFullYear(), now.getMonth(), 1);
     to = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -54,9 +73,9 @@ export async function checkReadingQuota(
   const used = await countReadingsInRange(userId, from, to);
 
   return {
-    allowed: used < readingsMonthlyLimit,
+    allowed: used < limit,
     used,
-    limit: readingsMonthlyLimit,
+    limit,
     cycleEnd: subscription ? to : null,
   };
 }
