@@ -115,3 +115,24 @@ export async function getCombinationById(
   await connectDB();
   return CardCombination.findById(id).lean();
 }
+
+export async function listUserInterpretations(
+  userId: string,
+  page: number = 1,
+  perPage: number = 10
+): Promise<{ items: IUserInterpretation[]; total: number }> {
+  await connectDB();
+
+  const skip = (page - 1) * perPage;
+
+  const [items, total] = await Promise.all([
+    UserInterpretation.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(perPage)
+      .lean(),
+    UserInterpretation.countDocuments({ userId }),
+  ]);
+
+  return { items, total };
+}
