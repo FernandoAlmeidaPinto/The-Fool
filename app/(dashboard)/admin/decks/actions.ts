@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { createDeck, updateDeck, addCard, updateCard } from "@/lib/decks/service";
-import { uploadFile, validateImage } from "@/lib/storage/s3";
+import { uploadFile, validateImage, processCardImage } from "@/lib/storage/s3";
 import { redirect } from "next/navigation";
 
 async function requireDecksPermission() {
@@ -63,10 +63,10 @@ export async function addCardAction(formData: FormData) {
     throw new Error(validationError);
   }
 
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const key = `decks/${deckId}/${randomUUID()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const imageUrl = await uploadFile(buffer, key, file.type);
+  const key = `decks/${deckId}/${randomUUID()}.jpg`;
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const processedBuffer = await processCardImage(rawBuffer);
+  const imageUrl = await uploadFile(processedBuffer, key, "image/jpeg");
 
   await addCard(deckId, { title, description: description ?? "", image: imageUrl });
   redirect(`/admin/decks/${deckId}/edit`);
@@ -96,10 +96,10 @@ export async function updateCardAction(formData: FormData) {
       throw new Error(validationError);
     }
 
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const key = `decks/${deckId}/${randomUUID()}.${ext}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    data.image = await uploadFile(buffer, key, file.type);
+    const key = `decks/${deckId}/${randomUUID()}.jpg`;
+    const rawBuffer = Buffer.from(await file.arrayBuffer());
+    const processedBuffer = await processCardImage(rawBuffer);
+    data.image = await uploadFile(processedBuffer, key, "image/jpeg");
   }
 
   await updateCard(deckId, cardId, data);
