@@ -10,6 +10,7 @@ import {
   Settings,
   Shield,
   CreditCard,
+  Crown,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarSection } from "./sidebar-section";
@@ -51,6 +52,12 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
       <nav className="space-y-1">
         <SidebarItem href="/perfil" label="Meu Perfil" icon={User} onNavigate={onNavigate} />
         <SidebarItem href="/configuracoes" label="Configurações" icon={Settings} onNavigate={onNavigate} />
+      </nav>
+
+      <div className="my-2 border-t border-border" />
+
+      <nav className="space-y-1">
+        <SidebarItem href="/planos" label="Planos" icon={Crown} onNavigate={onNavigate} />
       </nav>
 
       {isAdmin && (
