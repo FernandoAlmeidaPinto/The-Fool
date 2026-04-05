@@ -27,7 +27,7 @@ Reusable, user-independent interpretation of a card combination.
 interface ICardCombination {
   _id: ObjectId;
   deckId: ObjectId;
-  cardIds: ObjectId[];       // sorted (normalized)
+  cardIds: ObjectId[];       // order preserved (position matters)
   cardKey: string;           // normalized join: "id1_id2_id3"
   answer: string;            // generated interpretation
   status: "generated" | "reviewed";
@@ -38,8 +38,8 @@ interface ICardCombination {
 ```
 
 - Unique index on `deckId + cardKey`
-- `cardIds` always sorted before saving (normalization)
-- `cardKey` generated from sorted cardIds joined with `_`
+- `cardIds` stored in selection order (position matters in tarot)
+- `cardKey` generated from cardIds joined with `_` (order preserved)
 - `status: "generated"` when created by AI, `"reviewed"` when admin approves (future)
 - `source: "ai"` from provider, `"manual"` if admin writes it (future)
 
@@ -52,7 +52,7 @@ interface IUserInterpretation {
   _id: ObjectId;
   userId: ObjectId;
   deckId: ObjectId;
-  cardIds: ObjectId[];       // sorted (normalized)
+  cardIds: ObjectId[];       // order preserved (position matters)
   cardKey: string;
   context: string;           // user's question/context (required)
   answer: string;            // contextual AI interpretation
@@ -68,14 +68,13 @@ interface IUserInterpretation {
 
 ### Normalization
 
-Before saving or querying, always:
+Before saving or querying:
 
 ```typescript
-const normalizedCardIds = [...cardIds].map(id => id.toString()).sort();
-const cardKey = normalizedCardIds.join("_");
+const cardKey = cardIds.map(id => id.toString()).join("_");
 ```
 
-This ensures `[x, y]` and `[y, x]` resolve to the same combination. The `.toString()` is required because card IDs are subdocument ObjectIds — sorting must operate on string representations for consistency.
+Order is preserved — `[x, y]` and `[y, x]` are **different combinations** with different interpretations. In tarot, the position/order of cards carries meaning.
 
 ### Important: Card IDs are subdocument IDs
 
@@ -177,7 +176,7 @@ interface AIProvider {
 createReadingAction(deckId, cardIds, context):
   1. Verify permission (readings:create)
   2. Verify quota (count this month < readingsMonthlyLimit)
-  3. Normalize cardIds → sort, generate cardKey
+  3. Generate cardKey from cardIds (order preserved)
   4. Validate: 2 ≤ cardIds.length ≤ 5, all cards belong to deck
   5. Fetch card data (title, description) for prompt building
   6. Look up card_combinations by deckId + cardKey
