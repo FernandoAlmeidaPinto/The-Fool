@@ -35,7 +35,7 @@ export default async function CardDetailPage({ params }: Props) {
             <img
               src={card.image}
               alt={card.title}
-              className="object-cover w-full h-full"
+              className="object-contain w-full h-full"
             />
           ) : (
             <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
