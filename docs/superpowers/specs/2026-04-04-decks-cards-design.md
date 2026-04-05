@@ -22,7 +22,7 @@ Deck {
   name: string              // "Rider-Waite Tarot"
   description: string
   type: string              // enum: "tarot", "lenormand", "oracle"
-  coverImage: string | null // URL in MinIO (optional deck cover)
+  coverImage: string | null // URL in MinIO (field in schema, no upload UI in this sub-project — uses first card's image)
   cards: Card[]             // subdocument array
   createdAt: Date
   updatedAt: Date
@@ -99,15 +99,17 @@ Bucket is created automatically on first upload if it doesn't exist (via `Create
 
 Images are served via the public URL of MinIO in development. The bucket policy is set to public-read for the cards bucket.
 
+**Upload constraints:** Accept JPEG, PNG, and WebP only. Max file size: 5MB. Validate on the server before uploading to MinIO.
+
 ## 3. Permissions
 
-New permission added to `PERMISSIONS` enum:
+New permission added to `PERMISSIONS` enum in `lib/permissions/constants.ts`:
 
 ```typescript
 ADMIN_DECKS: "admin:decks",
 ```
 
-Added to the "admin" seed profile's permissions. Sidebar admin accordion gains "Baralhos" item. Admin layout's permission check updated to include `admin:decks`.
+Added to the "admin" seed profile's permissions (update `lib/db/seed.ts`). Sidebar admin accordion gains "Baralhos" item. Admin layout's permission check updated to include `admin:decks`.
 
 ## 4. Admin Pages — Deck & Card CRUD
 
@@ -196,7 +198,8 @@ All UI text in Portuguese (pt-BR): "Baralhos", "Cartas", "Adicionar Carta", "Tip
 
 - Card annotations/descriptions with clickable points (sub-project 2)
 - Drag-and-drop card reordering (future — `order` field supports it)
-- Deck cover image upload (can reuse first card's image for now)
+- Deck cover image upload UI (field exists in schema, uses first card's image for display)
+- Deck/card deletion (no hard delete in this phase)
 - S3/R2 integration (MinIO only for now — same SDK, swap env vars later)
 - Public (unauthenticated) access to decks
 - Card search/filter
