@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserById } from "@/lib/users/service";
 import { getProfileBySlug } from "@/lib/profiles/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
+import { getActiveSubscription } from "@/lib/subscriptions/service";
 import { ProfileForm } from "@/components/profile/profile-form";
 
 export default async function PerfilPage() {
@@ -24,12 +25,16 @@ export default async function PerfilPage() {
   // Fetch reading quota
   const readingsMonthlyLimit = profile?.readingsMonthlyLimit ?? null;
   const readingQuota = await checkReadingQuota(session.user.id, readingsMonthlyLimit);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const subscription = await getActiveSubscription(session.user.id);
 
   // Build plan info
   const planName = profile?.name ?? "Sem plano";
   const limits = [
     {
-      label: "Leituras este mês",
+      label: "Leituras" + (readingQuota.cycleEnd
+        ? ` (renova em ${new Date(readingQuota.cycleEnd).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })})`
+        : " este mês"),
       used: readingQuota.used,
       limit: readingQuota.limit,
     },
