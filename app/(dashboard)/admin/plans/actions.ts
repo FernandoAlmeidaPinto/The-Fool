@@ -23,6 +23,8 @@ export async function createPlanAction(formData: FormData) {
   const currency = formData.get("currency") as string;
   const interval = formData.get("interval") as string;
   const profileId = formData.get("profileId") as string;
+  const readingsLimitStr = formData.get("readingsMonthlyLimit") as string;
+  const readingsMonthlyLimit = readingsLimitStr ? parseInt(readingsLimitStr, 10) : null;
 
   if (!name || !priceStr || !profileId) {
     throw new Error("Name, price, and profile are required");
@@ -37,6 +39,7 @@ export async function createPlanAction(formData: FormData) {
     currency: currency || "BRL",
     interval: interval || "monthly",
     profileId,
+    readingsMonthlyLimit,
   });
 
   redirect("/admin/plans");
@@ -52,6 +55,8 @@ export async function updatePlanAction(formData: FormData) {
   const currency = formData.get("currency") as string;
   const interval = formData.get("interval") as string;
   const profileId = formData.get("profileId") as string;
+  const readingsLimitStr = formData.get("readingsMonthlyLimit") as string;
+  const readingsMonthlyLimit = readingsLimitStr ? parseInt(readingsLimitStr, 10) : null;
 
   if (!id || !name || !priceStr || !profileId) {
     throw new Error("Required fields missing");
@@ -66,6 +71,7 @@ export async function updatePlanAction(formData: FormData) {
     currency: currency || "BRL",
     interval: interval || "monthly",
     profileId,
+    readingsMonthlyLimit,
   });
 
   redirect("/admin/plans");

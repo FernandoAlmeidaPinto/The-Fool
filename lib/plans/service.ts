@@ -19,6 +19,7 @@ export async function createPlan(data: {
   currency: string;
   interval: string;
   profileId: string;
+  readingsMonthlyLimit?: number | null;
 }): Promise<IPlan> {
   await connectDB();
   return Plan.create(data);
@@ -33,6 +34,7 @@ export async function updatePlan(
     currency?: string;
     interval?: string;
     profileId?: string;
+    readingsMonthlyLimit?: number | null;
     active?: boolean;
   }
 ): Promise<IPlan | null> {

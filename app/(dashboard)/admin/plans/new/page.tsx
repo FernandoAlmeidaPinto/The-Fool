@@ -63,6 +63,17 @@ export default async function NewPlanPage() {
             </select>
           </div>
           <div className="space-y-2">
+            <Label htmlFor="readingsMonthlyLimit">Leituras por mês</Label>
+            <Input
+              id="readingsMonthlyLimit"
+              name="readingsMonthlyLimit"
+              type="number"
+              min="0"
+              placeholder="Vazio = ilimitado"
+            />
+            <p className="text-xs text-muted-foreground">Deixe vazio para ilimitado.</p>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="profileId">Profile</Label>
             <select
               id="profileId"

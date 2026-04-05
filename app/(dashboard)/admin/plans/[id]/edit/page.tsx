@@ -75,6 +75,18 @@ export default async function EditPlanPage({
             </select>
           </div>
           <div className="space-y-2">
+            <Label htmlFor="readingsMonthlyLimit">Leituras por mês</Label>
+            <Input
+              id="readingsMonthlyLimit"
+              name="readingsMonthlyLimit"
+              type="number"
+              min="0"
+              defaultValue={plan.readingsMonthlyLimit?.toString() ?? ""}
+              placeholder="Vazio = ilimitado"
+            />
+            <p className="text-xs text-muted-foreground">Deixe vazio para ilimitado.</p>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="profileId">Profile</Label>
             <select
               id="profileId"
