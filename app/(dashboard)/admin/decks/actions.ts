@@ -4,8 +4,9 @@ import { randomUUID } from "crypto";
 import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
-import { createDeck, updateDeck, addCard, updateCard } from "@/lib/decks/service";
+import { createDeck, updateDeck, addCard, updateCard, getDeckById } from "@/lib/decks/service";
 import { uploadFile, validateImage, processCardImage } from "@/lib/storage/s3";
+import { parseAspectRatio } from "@/lib/decks/constants";
 import { redirect } from "next/navigation";
 
 async function requireDecksPermission() {
@@ -21,12 +22,13 @@ export async function createDeckAction(formData: FormData) {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const type = formData.get("type") as string;
+  const aspectRatio = formData.get("cardAspectRatio") as string;
 
-  if (!name || !type) {
-    throw new Error("Name and type are required");
+  if (!name || !type || !aspectRatio) {
+    throw new Error("Nome, tipo e proporção são obrigatórios");
   }
 
-  await createDeck({ name, description: description ?? "", type });
+  await createDeck({ name, description: description ?? "", type, cardAspectRatio: aspectRatio });
   redirect("/admin/decks");
 }
 
@@ -37,12 +39,13 @@ export async function updateDeckAction(formData: FormData) {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const type = formData.get("type") as string;
+  const aspectRatio = formData.get("cardAspectRatio") as string;
 
   if (!id || !name) {
-    throw new Error("ID and name are required");
+    throw new Error("Campos obrigatórios faltando");
   }
 
-  await updateDeck(id, { name, description: description ?? "", type });
+  await updateDeck(id, { name, description: description ?? "", type, cardAspectRatio: aspectRatio });
   redirect(`/admin/decks/${id}/edit`);
 }
 
@@ -63,9 +66,13 @@ export async function addCardAction(formData: FormData) {
     throw new Error(validationError);
   }
 
+  const deck = await getDeckById(deckId);
+  if (!deck) throw new Error("Baralho não encontrado");
+
+  const { width, height } = parseAspectRatio(deck.cardAspectRatio);
   const key = `decks/${deckId}/${randomUUID()}.jpg`;
   const rawBuffer = Buffer.from(await file.arrayBuffer());
-  const processedBuffer = await processCardImage(rawBuffer);
+  const processedBuffer = await processCardImage(rawBuffer, width, height);
   const imageUrl = await uploadFile(processedBuffer, key, "image/jpeg");
 
   await addCard(deckId, { title, description: description ?? "", image: imageUrl });
@@ -96,9 +103,13 @@ export async function updateCardAction(formData: FormData) {
       throw new Error(validationError);
     }
 
+    const deck = await getDeckById(deckId);
+    if (!deck) throw new Error("Baralho não encontrado");
+
+    const { width, height } = parseAspectRatio(deck.cardAspectRatio);
     const key = `decks/${deckId}/${randomUUID()}.jpg`;
     const rawBuffer = Buffer.from(await file.arrayBuffer());
-    const processedBuffer = await processCardImage(rawBuffer);
+    const processedBuffer = await processCardImage(rawBuffer, width, height);
     data.image = await uploadFile(processedBuffer, key, "image/jpeg");
   }
 

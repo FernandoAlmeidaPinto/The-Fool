@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCardFromDeck } from "@/lib/decks/service";
+import { parseAspectRatio } from "@/lib/decks/constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
@@ -26,7 +27,10 @@ export default async function CardDetailPage({ params }: Props) {
       </Link>
 
       <div className="flex flex-col items-center gap-4">
-        <div className="relative w-full max-w-sm aspect-[2/3] max-h-96 rounded-lg overflow-hidden bg-muted shadow-md">
+        <div
+          className="relative w-full max-w-sm max-h-96 rounded-lg overflow-hidden bg-muted shadow-md"
+          style={{ aspectRatio: parseAspectRatio(deck.cardAspectRatio).cssValue }}
+        >
           {card.image ? (
             <img
               src={card.image}

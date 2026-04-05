@@ -4,12 +4,16 @@ interface CardThumbnailProps {
   href: string;
   title: string;
   image: string | null;
+  aspectRatio?: string; // CSS aspect-ratio value, e.g. "2/3", "3/4", "1/1"
 }
 
-export function CardThumbnail({ href, title, image }: CardThumbnailProps) {
+export function CardThumbnail({ href, title, image, aspectRatio = "2/3" }: CardThumbnailProps) {
   return (
     <Link href={href} className="group flex flex-col gap-2">
-      <div className="aspect-2/3 max-h-96 relative overflow-hidden rounded-md border border-border bg-muted">
+      <div
+        className="max-h-96 relative overflow-hidden rounded-md border border-border bg-muted"
+        style={{ aspectRatio }}
+      >
         {image ? (
           <img
             src={image}

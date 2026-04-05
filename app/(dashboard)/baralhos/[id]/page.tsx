@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getDeckById } from "@/lib/decks/service";
-import { DECK_TYPE_LABELS, DeckType } from "@/lib/decks/constants";
+import { DECK_TYPE_LABELS, DeckType, parseAspectRatio } from "@/lib/decks/constants";
 import { Badge } from "@/components/ui/badge";
 import { CardThumbnail } from "@/components/card-thumbnail";
 
@@ -40,6 +40,7 @@ export default async function DeckPage({ params }: Props) {
               href={`/baralhos/${id}/carta/${card._id.toString()}`}
               title={card.title}
               image={card.image ?? null}
+              aspectRatio={parseAspectRatio(deck.cardAspectRatio).cssValue}
             />
           ))}
         </div>

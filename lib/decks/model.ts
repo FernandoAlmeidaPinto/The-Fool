@@ -21,6 +21,7 @@ export interface IDeck {
   name: string;
   description: string;
   type: string;
+  cardAspectRatio: string;
   coverImage: string | null;
   cards: mongoose.Types.DocumentArray<ICard>;
   createdAt: Date;
@@ -36,6 +37,7 @@ const DeckSchema = new Schema<IDeck>(
       enum: ["tarot", "lenormand", "oracle"],
       required: true,
     },
+    cardAspectRatio: { type: String, default: "2/3" },
     coverImage: { type: String, default: null },
     cards: { type: [CardSchema], default: [] },
   },

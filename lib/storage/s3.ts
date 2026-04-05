@@ -47,10 +47,6 @@ async function ensureBucket() {
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
 
-// Card image standard dimensions (2:3 aspect ratio)
-const CARD_WIDTH = 600;
-const CARD_HEIGHT = 900;
-
 export function validateImage(file: File): string | null {
   if (!ALLOWED_TYPES.includes(file.type)) {
     return "Formato inválido. Use JPEG, PNG ou WebP.";
@@ -62,13 +58,17 @@ export function validateImage(file: File): string | null {
 }
 
 /**
- * Process a card image: resize and center-crop to 600x900 (2:3 ratio).
+ * Process a card image: resize and center-crop to the given dimensions.
  * Output is always JPEG for consistency and smaller file size.
  */
-export async function processCardImage(buffer: Buffer): Promise<Buffer> {
+export async function processCardImage(
+  buffer: Buffer,
+  width: number = 600,
+  height: number = 900
+): Promise<Buffer> {
   const sharp = (await import("sharp")).default;
   return sharp(buffer)
-    .resize(CARD_WIDTH, CARD_HEIGHT, {
+    .resize(width, height, {
       fit: "cover",
       position: "centre",
     })
