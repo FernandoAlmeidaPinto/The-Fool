@@ -61,32 +61,40 @@ export function PlanCard({ plan, isCurrent, hasSubscription }: PlanCardProps) {
 
   return (
     <div
-      className={`rounded-lg border bg-card p-6 shadow-sm ${
-        isCurrent
-          ? "border-primary ring-2 ring-primary/20"
-          : "border-border"
+      className={`flex flex-col rounded-lg border bg-card p-6 shadow-sm h-full ${
+        isCurrent ? "border-primary ring-2 ring-primary/20" : "border-border"
       }`}
     >
-      <div className="space-y-4">
-        <div>
-          {isCurrent && (
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary mb-2">
-              Plano Atual
-            </span>
-          )}
-          <h3 className="text-lg font-semibold">{plan.name}</h3>
-          {plan.description && (
-            <RichTextViewer content={plan.description} className="text-sm text-muted-foreground mt-1" />
-          )}
-        </div>
-
-        <div>
-          <span className="text-3xl font-bold">{formattedPrice}</span>
-          <span className="text-sm text-muted-foreground">
-            {INTERVAL_LABELS[plan.interval] ?? ""}
+      {/* Header — always at top */}
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold">{plan.name}</h3>
+        {isCurrent && (
+          <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+            Atual
           </span>
-        </div>
+        )}
+      </div>
 
+      {/* Description — grows to fill space */}
+      <div className="flex-1 mt-2">
+        {plan.description && (
+          <RichTextViewer
+            content={plan.description}
+            className="text-sm text-muted-foreground"
+          />
+        )}
+      </div>
+
+      {/* Price */}
+      <div className="mt-4">
+        <span className="text-3xl font-bold">{formattedPrice}</span>
+        <span className="text-sm text-muted-foreground">
+          {INTERVAL_LABELS[plan.interval] ?? ""}
+        </span>
+      </div>
+
+      {/* Button — always at bottom */}
+      <div className="mt-4">
         {isCurrent ? (
           <Button
             variant="outline"
