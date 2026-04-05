@@ -4,6 +4,7 @@ import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect, notFound } from "next/navigation";
 import { getDeckById, getCardFromDeck } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +38,12 @@ export default async function EditCardPage({
     <Card className="max-w-2xl">
       <CardHeader>
         <CardTitle>Editar Carta — {card.title}</CardTitle>
+        <Link
+          href={`/admin/decks/${id}/cards/${cardId}/annotations`}
+          className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          Gerenciar Anotações ({card.annotations?.length ?? 0})
+        </Link>
       </CardHeader>
       <CardContent>
         <form action={updateCardAction} className="space-y-4">
