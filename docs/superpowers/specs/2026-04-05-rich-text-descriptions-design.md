@@ -102,7 +102,7 @@ New packages:
 ## Files Modified
 
 ### Schema
-- `lib/decks/model.ts` — annotation description maxlength 500 → 1000
+- `lib/decks/model.ts` — annotation description maxlength 500 → 2000
 
 ### Admin forms (replace plain inputs with RichTextEditor)
 - `app/(dashboard)/admin/decks/new/page.tsx` — deck description
@@ -121,8 +121,8 @@ New packages:
 - `components/card-annotations-viewer.tsx` — annotation description (desktop tooltip + mobile panel)
 
 ### Utilities
-- `lib/utils/sanitize-html.ts` — shared sanitize-html config (same allow list used by viewer and server actions)
-- `lib/utils/strip-html.ts` — strip HTML tags to get plain text (for annotation sidebar preview truncation, maxLength counting)
+- `lib/html/sanitize.ts` — shared sanitize-html config (same allow list used by viewer and server actions)
+- `lib/html/strip.ts` — strip HTML tags to get plain text (for annotation sidebar preview truncation, maxLength counting)
 
 ### Annotation editor internals
 - `components/admin/annotation-editor.tsx` — also update the sidebar annotation list preview to strip HTML before truncating
