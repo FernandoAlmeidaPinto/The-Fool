@@ -71,11 +71,19 @@ interface IUserInterpretation {
 Before saving or querying, always:
 
 ```typescript
-const normalizedCardIds = [...cardIds].sort();
+const normalizedCardIds = [...cardIds].map(id => id.toString()).sort();
 const cardKey = normalizedCardIds.join("_");
 ```
 
-This ensures `[x, y]` and `[y, x]` resolve to the same combination.
+This ensures `[x, y]` and `[y, x]` resolve to the same combination. The `.toString()` is required because card IDs are subdocument ObjectIds — sorting must operate on string representations for consistency.
+
+### Important: Card IDs are subdocument IDs
+
+Cards are subdocuments embedded in `Deck.cards` (not a separate collection). This means:
+- `cardIds` in both collections reference subdocument `_id` values, not refs to a Card collection
+- To resolve card data, fetch the parent Deck by `deckId` and filter `deck.cards` by the stored `cardIds`
+- If a card is ever deleted and re-added to a deck, its subdocument ObjectId changes, orphaning existing combinations and interpretations that reference the old ID
+- This is acceptable for MVP — cards are admin-managed and rarely deleted
 
 ## AI Provider (Adapter Pattern)
 
@@ -118,9 +126,10 @@ interface AIProvider {
 
 ### Permission
 
-- New permission: `PERMISSIONS.READINGS_CREATE` (`readings:create`)
-- Added to the `PERMISSIONS` enum in `lib/permissions/constants.ts`
-- Users without this permission cannot access the reading feature
+- `PERMISSIONS.READINGS_CREATE` (`readings:create`) — already exists in `lib/permissions/constants.ts`
+- `PERMISSIONS.READINGS_VIEW` (`readings:view`) — already exists, used for viewing the hub page
+- Users without `readings:create` cannot create new readings
+- The `ai:use` permission exists but is not required for this feature (it's reserved for future direct AI access features)
 
 ### Monthly Limit
 
@@ -139,7 +148,7 @@ interface AIProvider {
 
 ### `/leituras` — Readings hub
 
-- Permission-gated: requires `readings:create`
+- Permission-gated: requires `readings:view` (viewing the hub) — `readings:create` needed for the "Nova Leitura" button
 - "Nova Leitura" button with quota counter
 - Future: list of past readings (history) — out of scope for now
 - Placeholder text for history section: "Em breve"
@@ -147,8 +156,8 @@ interface AIProvider {
 ### `/leituras/nova` — New reading wizard
 
 - Permission-gated: requires `readings:create`
-- Client component with wizard state management
-- **Step 1:** List available decks (cards from deck grid layout). Select one.
+- Single client component with `useState` for step management (not route-based steps)
+- **Step 1:** List available decks (card grid layout). Select one.
 - **Step 2:** Card grid for selected deck. Select 2-5 cards. Visual indicator for selected cards and count. Validation: minimum 2, maximum 5.
 - **Step 3:** Textarea for context/question (required). Quota reminder. Submit button.
 - On submit: calls server action that runs the generation flow
@@ -173,7 +182,7 @@ createReadingAction(deckId, cardIds, context):
   5. Fetch card data (title, description) for prompt building
   6. Look up card_combinations by deckId + cardKey
      - If exists → use cached answer
-     - If not → aiProvider.generateCombination(cards) → save to card_combinations
+     - If not → aiProvider.generateCombination(cards) → upsert to card_combinations (handles concurrent requests for same combination via unique index)
   7. aiProvider.generateInterpretation(cards, combination, context)
   8. Save to user_interpretations (with combinationId ref)
   9. Return the new interpretation ID
@@ -181,10 +190,9 @@ createReadingAction(deckId, cardIds, context):
 
 ## Seed Updates
 
-- Add `readings:create` to admin profile permissions
-- Add `readings:create` to free_tier profile permissions
-- Set `readingsMonthlyLimit: null` on admin profile (unlimited)
-- Set `readingsMonthlyLimit: 5` on free_tier profile
+- Permissions already in place: admin has `ALL_PERMISSIONS`, free_tier has `readings:view` + `readings:create`
+- Add `readingsMonthlyLimit: null` to admin profile seed (unlimited)
+- Add `readingsMonthlyLimit: 5` to free_tier profile seed
 
 ## Files
 
@@ -209,9 +217,9 @@ createReadingAction(deckId, cardIds, context):
 - `app/(dashboard)/leituras/actions.ts` — createReadingAction
 
 ### Modified files
-- `lib/permissions/constants.ts` — add READINGS_CREATE
-- `lib/profiles/model.ts` — add readingsMonthlyLimit field
-- `lib/db/seed.ts` — add permission + limits to seed profiles
+- `lib/profiles/model.ts` — add `readingsMonthlyLimit` field to schema + IProfile interface
+- `lib/db/seed.ts` — add `readingsMonthlyLimit` values to seed profiles
+- Note: `lib/permissions/constants.ts` already has `READINGS_CREATE` and `READINGS_VIEW` — no changes needed
 
 ## Out of Scope
 
