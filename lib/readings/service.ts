@@ -136,3 +136,34 @@ export async function listUserInterpretations(
 
   return { items, total };
 }
+
+export async function listCombinationsByDeck(
+  deckId: string
+): Promise<ICardCombination[]> {
+  await connectDB();
+  return CardCombination.find({ deckId })
+    .sort({ status: 1, createdAt: -1 })
+    .lean();
+}
+
+export async function countPendingCombinations(
+  deckId: string
+): Promise<number> {
+  await connectDB();
+  return CardCombination.countDocuments({ deckId, status: "generated" });
+}
+
+export async function reviewCombination(
+  id: string,
+  answer?: string
+): Promise<ICardCombination | null> {
+  await connectDB();
+
+  const update: Record<string, unknown> = { status: "reviewed" };
+  if (answer !== undefined) {
+    update.answer = answer;
+    update.source = "manual";
+  }
+
+  return CardCombination.findByIdAndUpdate(id, update, { new: true }).lean();
+}
