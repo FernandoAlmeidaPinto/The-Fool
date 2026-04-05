@@ -3,7 +3,8 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect, notFound } from "next/navigation";
 import { getDeckById } from "@/lib/decks/service";
-import { DECK_TYPES, DECK_TYPE_LABELS, ASPECT_RATIO_PRESETS, parseAspectRatio } from "@/lib/decks/constants";
+import { DECK_TYPES, DECK_TYPE_LABELS, parseAspectRatio } from "@/lib/decks/constants";
+import { AspectRatioSelect } from "@/components/aspect-ratio-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -62,27 +63,7 @@ export default async function EditDeckPage({
                 ))}
               </select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="cardAspectRatio">Proporção das Cartas</Label>
-              <select
-                id="cardAspectRatio"
-                name="cardAspectRatio"
-                defaultValue={
-                  ASPECT_RATIO_PRESETS.some((p) => p.value === deck.cardAspectRatio)
-                    ? deck.cardAspectRatio
-                    : "custom"
-                }
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {ASPECT_RATIO_PRESETS.filter((p) => p.value !== "custom").map((p) => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
-                <option value="custom">Personalizado</option>
-              </select>
-              {!ASPECT_RATIO_PRESETS.some((p) => p.value !== "custom" && p.value === deck.cardAspectRatio) && (
-                <p className="text-xs text-muted-foreground">Valor atual: {deck.cardAspectRatio}</p>
-              )}
-            </div>
+            <AspectRatioSelect defaultValue={deck.cardAspectRatio} />
             <Button type="submit">Salvar Alterações</Button>
           </form>
         </CardContent>

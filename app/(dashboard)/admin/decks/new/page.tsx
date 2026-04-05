@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect } from "next/navigation";
-import { DECK_TYPES, DECK_TYPE_LABELS, ASPECT_RATIO_PRESETS } from "@/lib/decks/constants";
+import { DECK_TYPES, DECK_TYPE_LABELS } from "@/lib/decks/constants";
+import { AspectRatioSelect } from "@/components/aspect-ratio-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,20 +48,7 @@ export default async function NewDeckPage() {
               ))}
             </select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="cardAspectRatio">Proporção das Cartas</Label>
-            <select
-              id="cardAspectRatio"
-              name="cardAspectRatio"
-              required
-              defaultValue="2/3"
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              {ASPECT_RATIO_PRESETS.filter((p) => p.value !== "custom").map((p) => (
-                <option key={p.value} value={p.value}>{p.label}</option>
-              ))}
-            </select>
-          </div>
+          <AspectRatioSelect />
           <Button type="submit">Criar Baralho</Button>
         </form>
       </CardContent>
