@@ -24,6 +24,7 @@ function getPageTitle(pathname: string): string {
   if (/^\/admin\/plans\/[^/]+\/edit$/.test(pathname)) return "Editar Plano";
   if (/^\/admin\/decks\/[^/]+\/edit$/.test(pathname)) return "Editar Baralho";
   if (/^\/admin\/decks\/[^/]+\/cards\/new$/.test(pathname)) return "Nova Carta";
+  if (/^\/admin\/decks\/[^/]+\/cards\/[^/]+\/annotations$/.test(pathname)) return "Anotações";
   if (/^\/admin\/decks\/[^/]+\/cards\/[^/]+\/edit$/.test(pathname)) return "Editar Carta";
   if (/^\/baralhos\/[^/]+$/.test(pathname)) return "Baralho";
   if (/^\/baralhos\/[^/]+\/carta\/[^/]+$/.test(pathname)) return "Carta";

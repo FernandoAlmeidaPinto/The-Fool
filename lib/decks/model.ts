@@ -1,12 +1,30 @@
 import mongoose, { Schema, models, model } from "mongoose";
 import type { Model } from "mongoose";
 
+export interface IAnnotation {
+  _id: mongoose.Types.ObjectId;
+  x: number;
+  y: number;
+  title: string;
+  description: string;
+  order: number;
+}
+
+const AnnotationSchema = new Schema<IAnnotation>({
+  x: { type: Number, required: true, min: 0, max: 100 },
+  y: { type: Number, required: true, min: 0, max: 100 },
+  title: { type: String, required: true, maxlength: 80 },
+  description: { type: String, default: "", maxlength: 500 },
+  order: { type: Number, required: true, default: 0 },
+});
+
 export interface ICard extends mongoose.Document {
   _id: mongoose.Types.ObjectId;
   title: string;
   description: string;
   image: string;
   order: number;
+  annotations: mongoose.Types.DocumentArray<IAnnotation>;
 }
 
 const CardSchema = new Schema<ICard>({
@@ -14,6 +32,7 @@ const CardSchema = new Schema<ICard>({
   description: { type: String, default: "" },
   image: { type: String, required: true },
   order: { type: Number, required: true, default: 0 },
+  annotations: { type: [AnnotationSchema], default: [] },
 });
 
 export interface IDeck {
