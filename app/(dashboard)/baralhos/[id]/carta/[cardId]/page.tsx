@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCardFromDeck } from "@/lib/decks/service";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
@@ -55,9 +53,9 @@ export default async function CardDetailPage({ params }: Props) {
         {prevCard ? (
           <Link
             href={`/baralhos/${id}/carta/${prevCard._id.toString()}`}
-            className={cn(buttonVariants({ variant: "outline" }))}
+            className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-muted transition-colors"
           >
-            <ChevronLeft className="w-4 h-4 mr-1" />
+            <ChevronLeft className="w-4 h-4" />
             {prevCard.title}
           </Link>
         ) : (
@@ -67,10 +65,10 @@ export default async function CardDetailPage({ params }: Props) {
         {nextCard ? (
           <Link
             href={`/baralhos/${id}/carta/${nextCard._id.toString()}`}
-            className={cn(buttonVariants({ variant: "outline" }), "ml-auto")}
+            className="inline-flex items-center gap-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-muted transition-colors ml-auto"
           >
             {nextCard.title}
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <ChevronRight className="w-4 h-4" />
           </Link>
         ) : (
           <div />
