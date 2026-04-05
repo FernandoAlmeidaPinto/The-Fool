@@ -4,6 +4,8 @@ import { useState, useRef, useTransition, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { stripHtml } from "@/lib/html/strip";
 
 type AnnotationData = {
   _id: string;
@@ -142,7 +144,7 @@ export function AnnotationEditor({
           x: pendingCoords.x,
           y: pendingCoords.y,
           title: title.trim(),
-          description: description.trim(),
+          description,
         });
         if (result) {
           const newAnnotation: AnnotationData = {
@@ -175,13 +177,13 @@ export function AnnotationEditor({
           cardId,
           annotationId: selectedId,
           title: title.trim(),
-          description: description.trim(),
+          description,
         });
         if (result) {
           setAnnotations((prev) =>
             prev.map((a) =>
               a._id === selectedId
-                ? { ...a, title: title.trim(), description: description.trim() }
+                ? { ...a, title: title.trim(), description }
                 : a
             )
           );
@@ -329,20 +331,15 @@ export function AnnotationEditor({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="ann-description">Descrição</Label>
-              <textarea
-                id="ann-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value.slice(0, 500))}
+              <Label>Descrição</Label>
+              <RichTextEditor
+                key={selectedId ?? (pendingCoords ? `${pendingCoords.x}-${pendingCoords.y}` : "new")}
+                content={description}
+                onChange={setDescription}
                 placeholder="Descrição da anotação"
-                maxLength={500}
-                rows={4}
+                maxLength={1000}
                 disabled={isPending}
-                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               />
-              <span className="text-xs text-muted-foreground">
-                {description.length}/500
-              </span>
             </div>
 
             {pendingCoords && (
@@ -422,7 +419,7 @@ export function AnnotationEditor({
                       <p className="font-medium leading-tight">{annotation.title}</p>
                       {annotation.description && (
                         <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                          {annotation.description}
+                          {stripHtml(annotation.description)}
                         </p>
                       )}
                     </div>
