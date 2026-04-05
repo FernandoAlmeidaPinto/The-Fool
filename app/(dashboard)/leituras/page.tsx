@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect } from "next/navigation";
-import { getProfileBySlug } from "@/lib/profiles/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { listUserInterpretations } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
@@ -27,22 +26,11 @@ export default async function LeiturasPage({ searchParams }: Props) {
 
   const canCreate = hasPermission(session, PERMISSIONS.READINGS_CREATE);
 
-  // Fetch quota and history in parallel
-  const profilePromise = canCreate && session.user.profileSlug
-    ? getProfileBySlug(session.user.profileSlug)
-    : Promise.resolve(null);
-
-  const historyPromise = listUserInterpretations(session.user.id, page, PER_PAGE);
-
-  const [profile, { items: readings, total }] = await Promise.all([
-    profilePromise,
-    historyPromise,
-  ]);
+  const { items: readings, total } = await listUserInterpretations(session.user.id, page, PER_PAGE);
 
   let quota: { allowed: boolean; used: number; limit: number | null } | null = null;
   if (canCreate) {
-    const readingsMonthlyLimit = profile?.readingsMonthlyLimit ?? null;
-    quota = await checkReadingQuota(session.user.id, readingsMonthlyLimit);
+    quota = await checkReadingQuota(session.user.id);
   }
 
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));

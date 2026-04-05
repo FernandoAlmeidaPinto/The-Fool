@@ -5,7 +5,6 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { createReading } from "@/lib/readings/service";
-import { getProfileBySlug } from "@/lib/profiles/service";
 
 export async function createReadingAction(data: {
   deckId: string;
@@ -18,13 +17,7 @@ export async function createReadingAction(data: {
   }
 
   // Check quota
-  const profile = session.user.profileSlug
-    ? await getProfileBySlug(session.user.profileSlug)
-    : null;
-
-  const readingsMonthlyLimit = profile?.readingsMonthlyLimit ?? null;
-
-  const quota = await checkReadingQuota(session.user.id, readingsMonthlyLimit);
+  const quota = await checkReadingQuota(session.user.id);
   if (!quota.allowed) {
     return { error: "Você atingiu o limite de leituras deste mês" };
   }

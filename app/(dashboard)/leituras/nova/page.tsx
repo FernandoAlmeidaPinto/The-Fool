@@ -3,7 +3,6 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect } from "next/navigation";
 import { listDecks } from "@/lib/decks/service";
-import { getProfileBySlug } from "@/lib/profiles/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { parseAspectRatio } from "@/lib/decks/constants";
 import { NewReadingWizard } from "@/components/readings/new-reading-wizard";
@@ -15,11 +14,7 @@ export default async function NovaLeituraPage() {
     redirect("/");
   }
 
-  const profile = session.user.profileSlug
-    ? await getProfileBySlug(session.user.profileSlug)
-    : null;
-  const readingsMonthlyLimit = profile?.readingsMonthlyLimit ?? null;
-  const quota = await checkReadingQuota(session.user.id, readingsMonthlyLimit);
+  const quota = await checkReadingQuota(session.user.id);
 
   if (!quota.allowed) {
     redirect("/leituras");

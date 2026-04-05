@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import { getUserById } from "@/lib/users/service";
-import { getProfileBySlug } from "@/lib/profiles/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { getActiveSubscription } from "@/lib/subscriptions/service";
 import { ProfileForm } from "@/components/profile/profile-form";
@@ -17,19 +16,16 @@ export default async function PerfilPage() {
     redirect("/auth/login");
   }
 
-  // Fetch profile for plan info
-  const profile = session.user.profileSlug
-    ? await getProfileBySlug(session.user.profileSlug)
-    : null;
-
-  // Fetch reading quota
-  const readingsMonthlyLimit = profile?.readingsMonthlyLimit ?? null;
-  const readingQuota = await checkReadingQuota(session.user.id, readingsMonthlyLimit);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const readingQuota = await checkReadingQuota(session.user.id);
   const subscription = await getActiveSubscription(session.user.id);
 
-  // Build plan info
-  const planName = profile?.name ?? "Sem plano";
+  // Get plan name
+  let planName = "Free Tier";
+  if (subscription) {
+    const { getPlanById } = await import("@/lib/plans/service");
+    const plan = await getPlanById(subscription.planId.toString());
+    planName = plan?.name ?? "Plano";
+  }
   const limits = [
     {
       label: "Leituras" + (readingQuota.cycleEnd
