@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SidebarContent } from "./sidebar";
+import type { Session } from "next-auth";
 
 interface MobileSidebarProps {
-  children: (onNavigate: () => void) => React.ReactNode;
+  session: Session;
 }
 
-export function MobileSidebar({ children }: MobileSidebarProps) {
+export function MobileSidebar({ session }: MobileSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   function close() {
@@ -39,7 +41,7 @@ export function MobileSidebar({ children }: MobileSidebarProps) {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            {children(close)}
+            <SidebarContent session={session} onNavigate={close} />
           </div>
         </>
       )}

@@ -28,9 +28,7 @@ export default async function DashboardLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <MobileSidebar>
-              {(onNavigate) => <SidebarContent session={session} onNavigate={onNavigate} />}
-            </MobileSidebar>
+            <MobileSidebar session={session} />
             <PageTitle />
           </div>
           <div className="flex items-center gap-3">
