@@ -11,8 +11,9 @@ yarn dev             # Start dev server (Next.js with hot reload)
 yarn build           # Production build
 yarn start           # Start production server
 yarn lint            # ESLint (flat config, no args needed)
-docker compose up -d # Start MongoDB
-docker compose down  # Stop MongoDB
+yarn seed            # Seed database (admin + free_tier profiles)
+docker compose up -d # Start MongoDB + MinIO
+docker compose down  # Stop MongoDB + MinIO
 ```
 
 No test framework is configured yet.
@@ -21,43 +22,96 @@ No test framework is configured yet.
 
 - **Next.js 16** (App Router) + React 19 + TypeScript (strict)
 - **Tailwind CSS 4** (v4 import syntax: `@import "tailwindcss"`)
-- **ESLint 9** flat config (`eslint.config.mjs`) extending `core-web-vitals` + TypeScript
-- **Target database:** MongoDB with Mongoose (not yet wired — see Phase 0 spec)
-- **Target auth:** Auth.js / NextAuth v5 (not yet wired)
+- **shadcn/ui** (base-nova style) with Ivory & Charcoal design system
+- **Auth.js v5** (NextAuth) — JWT sessions, Credentials + Google OAuth
+- **MongoDB** with Mongoose — Docker Compose for local dev
+- **MinIO** (S3-compatible) — Docker Compose for image storage
+- **ESLint 9** flat config extending `core-web-vitals` + TypeScript
+- **Package manager:** yarn
 
 ## Architecture
 
-This is a **tarot divination platform with AI interpretations**, built as a Next.js fullstack monolith. Implementation follows two phases defined in `docs/`:
+**The Fool** is a tarot learning platform, built as a Next.js fullstack monolith.
 
-- `docs/spec-fase-0-fundacao-nextjs-mongodb.md` — Foundation: auth, MongoDB, seeds, stubs
-- `docs/spec-fase-1-nextjs-mvp.md` — MVP: tarot readings, AI interpretation, content, billing
-
-### Intended project layout (from specs)
+### Project layout
 
 ```
-app/                    # Pages, layouts, route handlers
-  api/                  # Route Handlers (webhooks, health, external APIs)
-components/             # Shared React components
-lib/                    # Domain logic — NO JSX here
-  db/mongoose.ts        # Mongoose singleton (serverless connection reuse)
-  auth/                 # Auth.js config
-  users/                # User domain
-  tarot/                # Decks, cards, readings, spreads
-  billing/              # Plans, subscriptions, entitlements
-  preferences/          # User preferences
-  audit/                # Audit logging
+app/
+  (dashboard)/              # Authenticated pages (sidebar + header layout)
+    page.tsx                # Dashboard home
+    leituras/               # Stub: "Em breve"
+    cursos/                 # Stub: "Em breve"
+    perfil/                 # Stub: "Em breve"
+    configuracoes/          # Stub: "Em breve"
+    baralhos/               # Public deck/card browsing
+      [id]/                 # Card grid
+        carta/[cardId]/     # Card detail with annotations viewer
+    admin/                  # Admin pages (permission-gated)
+      profiles/             # Profile CRUD
+      plans/                # Plan CRUD
+      decks/                # Deck + Card + Annotation CRUD
+  auth/                     # Login/register (outside dashboard layout)
+  api/                      # Route Handlers
+    auth/[...nextauth]/     # Auth.js handler
+    health/                 # Health check
+components/
+  ui/                       # shadcn/ui components
+  dashboard/                # Sidebar, header, page-title, mobile-sidebar
+  admin/                    # Admin-specific components (annotation-editor)
+  card-thumbnail.tsx        # Reusable card grid item
+  card-annotations-viewer.tsx # Public annotations display
+  image-crop-upload.tsx     # Image crop before upload
+  aspect-ratio-select.tsx   # Aspect ratio picker with presets + custom
+lib/
+  db/mongoose.ts            # Mongoose singleton (serverless connection reuse)
+  db/seed.ts                # Seed script (admin + free_tier profiles)
+  auth/auth.ts              # Auth.js config, JWT callbacks with permissions
+  auth/auth-actions.ts      # Server Actions: register, login, logout
+  users/model.ts            # User schema (profileId ref)
+  permissions/constants.ts  # PERMISSIONS enum (resource:action format)
+  permissions/check.ts      # hasPermission(), hasAnyPermission()
+  profiles/model.ts         # Profile schema (name, slug, permissions[])
+  profiles/service.ts       # Profile CRUD
+  plans/model.ts            # Plan schema (price in cents, profileId ref)
+  plans/service.ts          # Plan CRUD
+  decks/model.ts            # Deck schema with Card + Annotation subdocs
+  decks/constants.ts        # DECK_TYPES, ASPECT_RATIO_PRESETS, parseAspectRatio
+  decks/service.ts          # Deck/Card/Annotation CRUD
+  storage/s3.ts             # S3/MinIO wrapper (upload, delete, validate, processCardImage)
+types/
+  next-auth.d.ts            # Session type augmentation (profileSlug, permissions)
 ```
 
-### Key conventions (from specs)
+### Key conventions
 
-- **All Mongoose queries live in `lib/`**, not in components. Server Actions should be thin wrappers that delegate to `lib/` functions.
+- **All Mongoose queries live in `lib/`**, not in components. Server Actions are thin wrappers.
 - **Domain separation:** `lib/<domain>/` contains services, types, and data access. No JSX.
-- **AI and payments use adapter pattern:** `AIProvider` and payment gateway interfaces with swappable implementations.
-- **Entitlements are centralized** — limits by plan, not scattered `if` checks in UI.
-- **Ownership filtering:** all user-scoped queries filter by `userId`.
+- **Permissions:** `resource:action` format cached in JWT token. Check via `hasPermission()`.
+- **Profiles:** User has one profile (free_tier default). Profiles hold permission arrays.
+- **Images:** Upload to MinIO via `lib/storage/s3.ts`. Use `<img>` tags (not `next/image`) for MinIO URLs.
+- **Card images:** Auto-processed on upload (resize + center-crop to deck's aspect ratio via sharp).
 - **Timestamps:** Mongoose `timestamps: true` for `createdAt`/`updatedAt`.
+- **Language:** All frontend UI text in Portuguese (pt-BR). Code identifiers in English.
 - **Path alias:** `@/*` maps to project root.
+
+### Next.js 16 specifics
+
+- `params` is async — always `await params` in page components
+- `headers()`, `cookies()` are async — must `await` them
+- `middleware.ts` renamed to `proxy.ts` with `export function proxy()`
+- Server Components cannot pass functions as children to Client Components
+- `buttonVariants()` is client-only — use Tailwind classes in Server Components
+- Always check `node_modules/next/dist/docs/` before using any Next.js API
 
 ## Current state
 
-Foundation complete: Ivory & Charcoal design system (shadcn/ui), Auth.js v5 with Credentials + Google OAuth (JWT sessions), MongoDB via Docker Compose, Mongoose singleton, register/login pages, health check endpoint. Ready for Phase 1 feature development.
+Foundation + Profiles/Permissions + Dashboard Layout + Decks/Cards/Annotations complete:
+
+- **Design system:** Ivory & Charcoal palette, Geist font, shadcn/ui (base-nova)
+- **Auth:** Email/password + Google OAuth, JWT sessions with cached permissions
+- **Profiles & Permissions:** Role-based (admin, free_tier), admin CRUD
+- **Plans:** CRUD with price in cents, linked to profiles (billing integration pending)
+- **Dashboard:** Sidebar with sections (nav, conta, admin accordion), header with page title, mobile overlay
+- **Decks & Cards:** Admin CRUD with image upload to MinIO, configurable aspect ratio per deck, image crop on upload
+- **Annotations:** Interactive annotations on cards — admin click-to-place editor, public viewer with SVG lines (desktop) and numbered dots (mobile)
+- **Stub pages:** Leituras, Cursos, Meu Perfil, Configurações ("Em breve")
