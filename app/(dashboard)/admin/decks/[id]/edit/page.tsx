@@ -64,6 +64,16 @@ export default async function EditDeckPage({
               </select>
             </div>
             <AspectRatioSelect defaultValue={deck.cardAspectRatio} />
+            <div className="space-y-2">
+              <Label htmlFor="coverImage">Imagem de Capa (opcional)</Label>
+              {deck.coverImage && (
+                <img src={deck.coverImage} alt="Capa atual" className="w-32 rounded-md border border-border" />
+              )}
+              <Input id="coverImage" name="coverImage" type="file" accept="image/jpeg,image/png,image/webp" />
+              <p className="text-xs text-muted-foreground">
+                {deck.coverImage ? "Envie uma nova imagem para substituir." : "Se não informada, usa a imagem da primeira carta."}
+              </p>
+            </div>
             <Button type="submit">Salvar Alterações</Button>
           </form>
         </CardContent>

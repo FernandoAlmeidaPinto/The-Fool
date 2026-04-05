@@ -24,11 +24,26 @@ export async function createDeckAction(formData: FormData) {
   const type = formData.get("type") as string;
   const aspectRatio = formData.get("cardAspectRatio") as string;
 
+  const coverFile = formData.get("coverImage") as File | null;
+
   if (!name || !type || !aspectRatio) {
     throw new Error("Nome, tipo e proporção são obrigatórios");
   }
 
-  await createDeck({ name, description: description ?? "", type, cardAspectRatio: aspectRatio });
+  let coverImage: string | undefined;
+  if (coverFile && coverFile.size > 0) {
+    const validationError = validateImage(coverFile);
+    if (validationError) throw new Error(validationError);
+
+    const key = `decks/covers/${randomUUID()}.jpg`;
+    const rawBuffer = Buffer.from(await coverFile.arrayBuffer());
+    // Cover image: resize to 600px wide, auto height
+    const sharp = (await import("sharp")).default;
+    const processedBuffer = await sharp(rawBuffer).resize(600, null).jpeg({ quality: 85 }).toBuffer();
+    coverImage = await uploadFile(processedBuffer, key, "image/jpeg");
+  }
+
+  await createDeck({ name, description: description ?? "", type, cardAspectRatio: aspectRatio, coverImage });
   redirect("/admin/decks");
 }
 
@@ -40,12 +55,28 @@ export async function updateDeckAction(formData: FormData) {
   const description = formData.get("description") as string;
   const type = formData.get("type") as string;
   const aspectRatio = formData.get("cardAspectRatio") as string;
+  const coverFile = formData.get("coverImage") as File | null;
 
   if (!id || !name) {
     throw new Error("Campos obrigatórios faltando");
   }
 
-  await updateDeck(id, { name, description: description ?? "", type, cardAspectRatio: aspectRatio });
+  const updateData: Parameters<typeof updateDeck>[1] = {
+    name, description: description ?? "", type, cardAspectRatio: aspectRatio,
+  };
+
+  if (coverFile && coverFile.size > 0) {
+    const validationError = validateImage(coverFile);
+    if (validationError) throw new Error(validationError);
+
+    const key = `decks/covers/${randomUUID()}.jpg`;
+    const rawBuffer = Buffer.from(await coverFile.arrayBuffer());
+    const sharp = (await import("sharp")).default;
+    const processedBuffer = await sharp(rawBuffer).resize(600, null).jpeg({ quality: 85 }).toBuffer();
+    updateData.coverImage = await uploadFile(processedBuffer, key, "image/jpeg");
+  }
+
+  await updateDeck(id, updateData);
   redirect(`/admin/decks/${id}/edit`);
 }
 

@@ -17,6 +17,7 @@ export async function createDeck(data: {
   description: string;
   type: string;
   cardAspectRatio?: string;
+  coverImage?: string;
 }): Promise<IDeck> {
   await connectDB();
   return Deck.create(data);
@@ -24,7 +25,7 @@ export async function createDeck(data: {
 
 export async function updateDeck(
   id: string,
-  data: { name?: string; description?: string; type?: string; cardAspectRatio?: string }
+  data: { name?: string; description?: string; type?: string; cardAspectRatio?: string; coverImage?: string }
 ): Promise<IDeck | null> {
   await connectDB();
   return Deck.findByIdAndUpdate(id, data, { new: true }).lean();

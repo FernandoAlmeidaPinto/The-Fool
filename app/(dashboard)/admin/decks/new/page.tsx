@@ -49,6 +49,11 @@ export default async function NewDeckPage() {
             </select>
           </div>
           <AspectRatioSelect />
+          <div className="space-y-2">
+            <Label htmlFor="coverImage">Imagem de Capa (opcional)</Label>
+            <Input id="coverImage" name="coverImage" type="file" accept="image/jpeg,image/png,image/webp" />
+            <p className="text-xs text-muted-foreground">Se não informada, usa a imagem da primeira carta.</p>
+          </div>
           <Button type="submit">Criar Baralho</Button>
         </form>
       </CardContent>
