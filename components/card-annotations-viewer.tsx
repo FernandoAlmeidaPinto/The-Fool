@@ -40,13 +40,7 @@ export function CardAnnotationsViewer({
     imageHeight: number;
   } | null>(null);
 
-  const titleRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
-
-  const [titlePositions, setTitlePositions] = useState<
-    Map<string, { x: number; y: number }>
-  >(new Map());
-
-  // Measure container, image, and title positions for SVG line calculations
+  // Measure container and image for SVG line calculations
   useEffect(() => {
     const measure = () => {
       const container = containerRef.current;
@@ -64,20 +58,8 @@ export function CardAnnotationsViewer({
         imageWidth: iRect.width,
         imageHeight: iRect.height,
       });
-
-      // Measure title positions in the same callback
-      const newPositions = new Map<string, { x: number; y: number }>();
-      titleRefs.current.forEach((el, id) => {
-        const tRect = el.getBoundingClientRect();
-        newPositions.set(id, {
-          x: tRect.left - cRect.left + tRect.width / 2,
-          y: tRect.top - cRect.top + tRect.height / 2,
-        });
-      });
-      setTitlePositions(newPositions);
     };
 
-    // Delay initial measure to allow title elements to render
     const raf = requestAnimationFrame(measure);
 
     const observer = new ResizeObserver(measure);
@@ -129,6 +111,23 @@ export function CardAnnotationsViewer({
     [dimensions]
   );
 
+  // Calculate title endpoint for SVG line (by annotation _id)
+  const getTitleSvgPosition = useCallback(
+    (ann: Annotation, side: "left" | "right", topPx: number) => {
+      if (!dimensions) return null;
+      // Title column is 140px wide. Left titles are right-aligned, right titles are left-aligned.
+      // Image area starts at 150px from each side (mx-[150px]).
+      const titleColumnWidth = 140;
+      const margin = 150; // matches mx-[150px]
+      const x = side === "left"
+        ? titleColumnWidth // right edge of left column
+        : dimensions.containerWidth - titleColumnWidth; // left edge of right column
+      const y = topPx;
+      return { x, y };
+    },
+    [dimensions]
+  );
+
   if (annotations.length === 0) return null;
 
   const sorted = [...annotations].sort((a, b) => a.order - b.order);
@@ -137,6 +136,17 @@ export function CardAnnotationsViewer({
 
   const leftPositions = distributeVertically(leftAnnotations);
   const rightPositions = distributeVertically(rightAnnotations);
+
+  // Build a map of annotation _id → SVG title endpoint
+  const titleSvgEndpoints = new Map<string, { x: number; y: number }>();
+  leftAnnotations.forEach((ann, i) => {
+    const pos = getTitleSvgPosition(ann, "left", leftPositions[i]);
+    if (pos) titleSvgEndpoints.set(ann._id, pos);
+  });
+  rightAnnotations.forEach((ann, i) => {
+    const pos = getTitleSvgPosition(ann, "right", rightPositions[i]);
+    if (pos) titleSvgEndpoints.set(ann._id, pos);
+  });
 
   return (
     <>
@@ -157,10 +167,6 @@ export function CardAnnotationsViewer({
               return (
                 <button
                   key={ann._id}
-                  ref={(el) => {
-                    if (el) titleRefs.current.set(ann._id, el);
-                    else titleRefs.current.delete(ann._id);
-                  }}
                   type="button"
                   className={`absolute right-0 max-w-[130px] cursor-pointer rounded px-2 py-1 text-right text-xs font-medium transition-colors ${
                     activeId === ann._id
@@ -228,10 +234,6 @@ export function CardAnnotationsViewer({
               return (
                 <button
                   key={ann._id}
-                  ref={(el) => {
-                    if (el) titleRefs.current.set(ann._id, el);
-                    else titleRefs.current.delete(ann._id);
-                  }}
                   type="button"
                   className={`absolute left-0 max-w-[130px] cursor-pointer rounded px-2 py-1 text-left text-xs font-medium transition-colors ${
                     activeId === ann._id
@@ -269,7 +271,7 @@ export function CardAnnotationsViewer({
             >
               {sorted.map((ann) => {
                 const dot = getDotPosition(ann);
-                const title = titlePositions.get(ann._id);
+                const title = titleSvgEndpoints.get(ann._id);
                 if (!title) return null;
                 const isActive = activeId === ann._id;
                 return (
