@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useTransition, useCallback } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -241,12 +240,10 @@ export function AnnotationEditor({
           style={{ aspectRatio: cardAspectRatio }}
           onClick={handleImageClick}
         >
-          <Image
+          <img
             src={cardImage}
             alt="Carta"
-            fill
-            className="pointer-events-none object-cover"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="pointer-events-none object-contain w-full h-full"
           />
 
           {/* Existing annotation dots */}
