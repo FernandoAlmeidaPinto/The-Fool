@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getDeckById } from "@/lib/decks/service";
 import { DECK_TYPE_LABELS, DeckType } from "@/lib/decks/constants";
@@ -43,11 +42,10 @@ export default async function DeckPage({ params }: Props) {
             >
               <div className="relative w-full aspect-[2/3] rounded-md overflow-hidden bg-muted">
                 {card.image ? (
-                  <Image
+                  <img
                     src={card.image}
                     alt={card.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform"
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform"
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-sm text-muted-foreground">

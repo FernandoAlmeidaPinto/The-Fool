@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { listDecks } from "@/lib/decks/service";
 import { DECK_TYPE_LABELS, DeckType } from "@/lib/decks/constants";
 import { Badge } from "@/components/ui/badge";
@@ -26,11 +25,10 @@ export default async function BaralhosPage() {
               >
                 <div className="relative w-full aspect-[3/2] bg-muted flex items-center justify-center">
                   {coverSrc ? (
-                    <Image
+                    <img
                       src={coverSrc}
                       alt={deck.name}
-                      fill
-                      className="object-cover"
+                      className="object-cover w-full h-full"
                     />
                   ) : (
                     <span className="text-sm text-muted-foreground">Sem imagem</span>

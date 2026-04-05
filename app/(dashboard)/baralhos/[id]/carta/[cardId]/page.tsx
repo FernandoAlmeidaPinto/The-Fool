@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getCardFromDeck } from "@/lib/decks/service";
 import { buttonVariants } from "@/components/ui/button";
@@ -31,11 +30,10 @@ export default async function CardDetailPage({ params }: Props) {
       <div className="flex flex-col items-center gap-4">
         <div className="relative w-full max-w-sm aspect-[2/3] rounded-lg overflow-hidden bg-muted shadow-md">
           {card.image ? (
-            <Image
+            <img
               src={card.image}
               alt={card.title}
-              fill
-              className="object-cover"
+              className="object-cover w-full h-full"
             />
           ) : (
             <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
