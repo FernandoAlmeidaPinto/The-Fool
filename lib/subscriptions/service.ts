@@ -95,6 +95,21 @@ export async function cancelSubscription(
 }
 
 /**
+ * Get userIds that have an active subscription with a given planId.
+ */
+export async function getUserIdsByPlanId(
+  planId: string
+): Promise<string[]> {
+  await connectDB();
+  const subs = await Subscription.find({
+    planId,
+    status: "active",
+    renewsAt: { $gt: new Date() },
+  }).select("userId").lean();
+  return subs.map((s) => s.userId.toString());
+}
+
+/**
  * Get active subscriptions for multiple users in one query.
  */
 export async function getActiveSubscriptionsByUserIds(

@@ -17,19 +17,28 @@ export async function updateUser(
 
 export async function listUsers(
   page: number = 1,
-  perPage: number = 20
+  perPage: number = 20,
+  filters?: { profileId?: string; userIds?: string[] }
 ): Promise<{ items: IUser[]; total: number }> {
   await connectDB();
+
+  const query: Record<string, unknown> = {};
+  if (filters?.profileId) {
+    query.profileId = filters.profileId;
+  }
+  if (filters?.userIds) {
+    query._id = { $in: filters.userIds };
+  }
 
   const skip = (page - 1) * perPage;
 
   const [items, total] = await Promise.all([
-    User.find()
+    User.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(perPage)
       .lean(),
-    User.countDocuments(),
+    User.countDocuments(query),
   ]);
 
   return { items, total };
