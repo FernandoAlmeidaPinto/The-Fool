@@ -121,6 +121,42 @@ export async function deleteAnnotation(
   return true;
 }
 
+export async function getActiveDailyDeck(): Promise<IDeck | null> {
+  await connectDB();
+  return Deck.findOne({ availableForDailyCard: true }).lean();
+}
+
+/**
+ * Atomically marks one deck as the active daily deck.
+ * Unsets the flag on every other deck first, then sets it on the target.
+ * Pass `deckId = null` to simply clear the flag (no active deck).
+ */
+export async function setAsDailyDeck(deckId: string | null): Promise<void> {
+  await connectDB();
+  await Deck.updateMany(
+    { availableForDailyCard: true },
+    { $set: { availableForDailyCard: false } }
+  );
+  if (deckId) {
+    await Deck.updateOne(
+      { _id: deckId },
+      { $set: { availableForDailyCard: true } }
+    );
+  }
+}
+
+export async function setCardDailyReflection(
+  deckId: string,
+  cardId: string,
+  reflection: string
+): Promise<void> {
+  await connectDB();
+  await Deck.updateOne(
+    { _id: deckId, "cards._id": cardId },
+    { $set: { "cards.$.dailyReflection": reflection } }
+  );
+}
+
 export async function getCardFromDeck(
   deckId: string,
   cardId: string
