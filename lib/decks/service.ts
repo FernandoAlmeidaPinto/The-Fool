@@ -127,34 +127,45 @@ export async function getActiveDailyDeck(): Promise<IDeck | null> {
 }
 
 /**
- * Atomically marks one deck as the active daily deck.
- * Unsets the flag on every other deck first, then sets it on the target.
+ * Marks one deck as the active daily deck, enforcing the "at most one
+ * active at a time" invariant. Uses a single ordered bulkWrite so the
+ * unset-all and set-one operations travel in one batch.
+ *
  * Pass `deckId = null` to simply clear the flag (no active deck).
  */
 export async function setAsDailyDeck(deckId: string | null): Promise<void> {
   await connectDB();
-  await Deck.updateMany(
-    { availableForDailyCard: true },
-    { $set: { availableForDailyCard: false } }
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ops: any[] = [
+    {
+      updateMany: {
+        filter: { availableForDailyCard: true },
+        update: { $set: { availableForDailyCard: false } },
+      },
+    },
+  ];
   if (deckId) {
-    await Deck.updateOne(
-      { _id: deckId },
-      { $set: { availableForDailyCard: true } }
-    );
+    ops.push({
+      updateOne: {
+        filter: { _id: deckId },
+        update: { $set: { availableForDailyCard: true } },
+      },
+    });
   }
+  await Deck.bulkWrite(ops, { ordered: true });
 }
 
 export async function setCardDailyReflection(
   deckId: string,
   cardId: string,
   reflection: string
-): Promise<void> {
+): Promise<boolean> {
   await connectDB();
-  await Deck.updateOne(
+  const result = await Deck.updateOne(
     { _id: deckId, "cards._id": cardId },
     { $set: { "cards.$.dailyReflection": reflection } }
   );
+  return result.matchedCount > 0;
 }
 
 export async function getCardFromDeck(
