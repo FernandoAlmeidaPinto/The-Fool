@@ -14,4 +14,15 @@ export class MockProvider implements AIProvider {
     const titles = cards.map((c) => c.title).join(", ");
     return `<p>Considerando sua pergunta: <em>"${context}"</em></p><p>As cartas <strong>${titles}</strong> indicam que este é um momento propício para confiar na sua intuição. O contexto que você trouxe ressoa com a energia dessa combinação, sugerindo que as respostas que busca já estão dentro de você.</p>`;
   }
+
+  async generatePracticeFeedback(
+    cards: CardData[],
+    baseCombination: string | null,
+    questionText: string,
+    userAnswer: string
+  ): Promise<string> {
+    const titles = cards.map((c) => c.title).join(", ");
+    const base = baseCombination ? " (considerando a combinação base)" : "";
+    return `<p><strong>Feedback sobre sua interpretação</strong>${base}:</p><p>Você trouxe boas conexões entre as cartas <strong>${titles}</strong> ao responder <em>"${questionText}"</em>. Um ponto forte da sua resposta foi o esforço de costurar uma narrativa — ${userAnswer.length} caracteres mostram dedicação. Como sugestão, tente explorar mais os símbolos individuais de cada carta antes de fechar a leitura conjunta.</p>`;
+  }
 }
