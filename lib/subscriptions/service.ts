@@ -110,6 +110,22 @@ export async function getUserIdsByPlanId(
 }
 
 /**
+ * Get userIds that do NOT have any active subscription.
+ */
+export async function getUserIdsWithoutActivePlan(): Promise<string[]> {
+  await connectDB();
+  const activeUserIds = await Subscription.distinct("userId", {
+    status: "active",
+    renewsAt: { $gt: new Date() },
+  });
+  const allUsers = await User.find(
+    { _id: { $nin: activeUserIds } },
+    { _id: 1 }
+  ).lean();
+  return allUsers.map((u) => u._id.toString());
+}
+
+/**
  * Get active subscriptions for multiple users in one query.
  */
 export async function getActiveSubscriptionsByUserIds(

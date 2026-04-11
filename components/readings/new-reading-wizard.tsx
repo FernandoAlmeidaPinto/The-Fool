@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { createReadingAction } from "@/app/(dashboard)/leituras/actions";
+import { PathChoice } from "./path-choice";
+import type { ReadingPath } from "./path-choice";
+import { PracticeStep } from "./practice-step";
 
 export interface DeckForWizard {
   _id: string;
@@ -25,13 +28,16 @@ interface NewReadingWizardProps {
   quotaLimit: number | null;
 }
 
+type WizardStep = "deck" | "cards" | "choice" | "practice" | "normal";
+
 export function NewReadingWizard({
   decks,
   quotaUsed,
   quotaLimit,
 }: NewReadingWizardProps) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<WizardStep>("choice");
+  const [readingPath, setReadingPath] = useState<ReadingPath | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<DeckForWizard | null>(null);
   const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
   const [context, setContext] = useState("");
@@ -41,7 +47,7 @@ export function NewReadingWizard({
   const handleSelectDeck = (deck: DeckForWizard) => {
     setSelectedDeck(deck);
     setSelectedCardIds([]);
-    setStep(2);
+    setStep("cards");
   };
 
   const handleToggleCard = (cardId: string) => {
@@ -54,7 +60,12 @@ export function NewReadingWizard({
     });
   };
 
-  const handleSubmit = () => {
+  const handleChoose = (path: ReadingPath) => {
+    setReadingPath(path);
+    setStep("deck");
+  };
+
+  const handleSubmitNormal = () => {
     if (!selectedDeck || selectedCardIds.length < 2 || !context.trim()) return;
 
     startTransition(async () => {
@@ -73,6 +84,28 @@ export function NewReadingWizard({
     });
   };
 
+  const selectedCardsSummary = selectedDeck && (
+    <div>
+      <p className="text-sm font-medium mb-2">Cartas selecionadas:</p>
+      <div className="flex gap-2 flex-wrap">
+        {selectedCardIds.map((cardId, i) => {
+          const card = selectedDeck.cards.find((c) => c._id === cardId);
+          return card ? (
+            <span
+              key={cardId}
+              className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium"
+            >
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                {i + 1}
+              </span>
+              {card.title}
+            </span>
+          ) : null;
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div>
       {error && (
@@ -81,10 +114,20 @@ export function NewReadingWizard({
         </div>
       )}
 
-      {/* Step 1: Select Deck */}
-      {step === 1 && (
+      {/* Step: Choice (first step) */}
+      {step === "choice" && (
+        <PathChoice onChoose={handleChoose} />
+      )}
+
+      {/* Step: Select Deck */}
+      {step === "deck" && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Escolha o baralho para sua leitura:</p>
+          <Button variant="ghost" onClick={() => setStep("choice")}>
+            ← Voltar
+          </Button>
+          <p className="text-sm text-muted-foreground">
+            Escolha o baralho para sua leitura:
+          </p>
           {decks.length === 0 ? (
             <p className="text-muted-foreground">Nenhum baralho disponível.</p>
           ) : (
@@ -98,15 +141,24 @@ export function NewReadingWizard({
                 >
                   <div className="relative w-full aspect-[3/2] bg-muted flex items-center justify-center">
                     {deck.coverImage ? (
-                      <img src={deck.coverImage} alt={deck.name} className="object-cover w-full h-full" />
+                      <img
+                        src={deck.coverImage}
+                        alt={deck.name}
+                        className="object-cover w-full h-full"
+                      />
                     ) : (
-                      <span className="text-sm text-muted-foreground">Sem imagem</span>
+                      <span className="text-sm text-muted-foreground">
+                        Sem imagem
+                      </span>
                     )}
                   </div>
                   <div className="p-3">
-                    <h3 className="font-semibold group-hover:underline">{deck.name}</h3>
+                    <h3 className="font-semibold group-hover:underline">
+                      {deck.name}
+                    </h3>
                     <span className="text-sm text-muted-foreground">
-                      {deck.cards.length} {deck.cards.length === 1 ? "carta" : "cartas"}
+                      {deck.cards.length}{" "}
+                      {deck.cards.length === 1 ? "carta" : "cartas"}
                     </span>
                   </div>
                 </button>
@@ -116,19 +168,26 @@ export function NewReadingWizard({
         </div>
       )}
 
-      {/* Step 2: Select Cards */}
-      {step === 2 && selectedDeck && (
+      {/* Step: Select Cards */}
+      {step === "cards" && selectedDeck && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">
-                Selecione de 2 a 5 cartas de <strong>{selectedDeck.name}</strong>:
+                Selecione de 2 a 5 cartas de{" "}
+                <strong>{selectedDeck.name}</strong>:
               </p>
               <p className="text-sm font-medium mt-1">
                 {selectedCardIds.length} de 5 selecionadas
               </p>
             </div>
-            <Button variant="ghost" onClick={() => { setStep(1); setSelectedCardIds([]); }}>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setStep("deck");
+                setSelectedCardIds([]);
+              }}
+            >
               Trocar baralho
             </Button>
           </div>
@@ -156,7 +215,9 @@ export function NewReadingWizard({
                       src={card.image}
                       alt={card.title}
                       className={`object-contain w-full h-full transition-opacity ${
-                        isSelected ? "opacity-100" : "opacity-70 group-hover:opacity-100"
+                        isSelected
+                          ? "opacity-100"
+                          : "opacity-70 group-hover:opacity-100"
                       }`}
                     />
                     {isSelected && (
@@ -175,7 +236,7 @@ export function NewReadingWizard({
 
           <div className="flex justify-end">
             <Button
-              onClick={() => setStep(3)}
+              onClick={() => setStep(readingPath === "practice" ? "practice" : "normal")}
               disabled={selectedCardIds.length < 2}
             >
               Continuar
@@ -184,33 +245,31 @@ export function NewReadingWizard({
         </div>
       )}
 
-      {/* Step 3: Context + Submit */}
-      {step === 3 && selectedDeck && (
+      {/* Step: Practice */}
+      {step === "practice" && selectedDeck && (
         <div className="space-y-4">
-          <Button variant="ghost" onClick={() => setStep(2)}>
-            ← Voltar para seleção
+          <div className="rounded-lg border border-border p-4">
+            {selectedCardsSummary}
+          </div>
+          <PracticeStep
+            deckId={selectedDeck._id}
+            cardIds={selectedCardIds}
+            quotaUsed={quotaUsed}
+            quotaLimit={quotaLimit}
+            onBack={() => setStep("cards")}
+          />
+        </div>
+      )}
+
+      {/* Step: Normal (write question + submit) */}
+      {step === "normal" && selectedDeck && (
+        <div className="space-y-4">
+          <Button variant="ghost" onClick={() => setStep("cards")}>
+            ← Voltar
           </Button>
 
           <div className="space-y-3 rounded-lg border border-border p-4">
-            <div>
-              <p className="text-sm font-medium mb-2">Cartas selecionadas:</p>
-              <div className="flex gap-2 flex-wrap">
-                {selectedCardIds.map((cardId, i) => {
-                  const card = selectedDeck.cards.find((c) => c._id === cardId);
-                  return card ? (
-                    <span
-                      key={cardId}
-                      className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium"
-                    >
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                        {i + 1}
-                      </span>
-                      {card.title}
-                    </span>
-                  ) : null;
-                })}
-              </div>
-            </div>
+            {selectedCardsSummary}
 
             <div className="space-y-1.5">
               <Label htmlFor="context">Sua pergunta ou contexto</Label>
@@ -233,8 +292,10 @@ export function NewReadingWizard({
             )}
 
             <Button
-              onClick={handleSubmit}
-              disabled={isPending || !context.trim() || selectedCardIds.length < 2}
+              onClick={handleSubmitNormal}
+              disabled={
+                isPending || !context.trim() || selectedCardIds.length < 2
+              }
               className="w-full"
             >
               {isPending ? "Gerando interpretação..." : "Gerar Leitura"}

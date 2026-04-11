@@ -12,6 +12,7 @@ import {
   Shield,
   CreditCard,
   Crown,
+  MessageCircleQuestionMark,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarSection } from "./sidebar-section";
@@ -21,6 +22,7 @@ const ADMIN_PERMISSIONS = [
   "admin:plans",
   "admin:users",
   "admin:decks",
+  "admin:practice_questions",
 ];
 
 interface SidebarContentProps {
@@ -63,6 +65,12 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
             <SidebarItem href="/admin/plans" label="Planos" icon={CreditCard} onNavigate={onNavigate} />
             <SidebarItem href="/admin/decks" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
             <SidebarItem href="/admin/users" label="Usuários" icon={Users} onNavigate={onNavigate} />
+            <SidebarItem
+              href="/admin/practice-questions"
+              label="Perguntas de Treino"
+              icon={MessageCircleQuestionMark}
+              onNavigate={onNavigate}
+            />
           </SidebarSection>
         </>
       )}

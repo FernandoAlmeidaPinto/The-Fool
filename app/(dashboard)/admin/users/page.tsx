@@ -3,7 +3,7 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect } from "next/navigation";
 import { listUsers } from "@/lib/users/service";
-import { getActiveSubscriptionsByUserIds, getUserIdsByPlanId } from "@/lib/subscriptions/service";
+import { getActiveSubscriptionsByUserIds, getUserIdsByPlanId, getUserIdsWithoutActivePlan } from "@/lib/subscriptions/service";
 import { Profile } from "@/lib/profiles/model";
 import { Plan } from "@/lib/plans/model";
 import { connectDB } from "@/lib/db/mongoose";
@@ -39,9 +39,13 @@ export default async function AdminUsersPage({ searchParams }: Props) {
     filters.profileId = filterProfileId;
   }
   if (filterPlanId) {
-    // Find userIds with active subscription for this plan
-    const userIdsForPlan = await getUserIdsByPlanId(filterPlanId);
-    filters.userIds = userIdsForPlan;
+    if (filterPlanId === "free") {
+      // Users without any active subscription
+      filters.userIds = await getUserIdsWithoutActivePlan();
+    } else {
+      // Users with active subscription for a specific plan
+      filters.userIds = await getUserIdsByPlanId(filterPlanId);
+    }
   }
 
   const { items: users, total } = await listUsers(page, PER_PAGE, filters);

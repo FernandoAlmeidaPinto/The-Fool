@@ -6,7 +6,17 @@ export interface CardData {
 
 export interface AIProvider {
   generateCombination(cards: CardData[]): Promise<string>;
-  generateInterpretation(cards: CardData[], combination: string, context: string): Promise<string>;
+  generateInterpretation(
+    cards: CardData[],
+    combination: string,
+    context: string
+  ): Promise<string>;
+  generatePracticeFeedback(
+    cards: CardData[],
+    baseCombination: string | null,
+    questionText: string,
+    userAnswer: string
+  ): Promise<string>;
 }
 
 import { MockProvider } from "./mock-provider";

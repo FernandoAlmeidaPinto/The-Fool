@@ -48,7 +48,7 @@ export default async function PlanosPage() {
       {activePlans.length === 0 ? (
         <p className="text-muted-foreground">Nenhum plano disponível no momento.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {activePlans.map((plan) => (
             <PlanCard
               key={plan._id.toString()}

@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getCardFromDeck } from "@/lib/decks/service";
-import { parseAspectRatio } from "@/lib/decks/constants";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CardAnnotationsViewer } from "@/components/card-annotations-viewer";
 import { RichTextViewer } from "@/components/ui/rich-text-viewer";
+import { parseAspectRatio } from "@/lib/decks/constants";
+import { getCardFromDeck } from "@/lib/decks/service";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 interface Props {
   params: Promise<{ id: string; cardId: string }>;
@@ -18,19 +18,30 @@ export default async function CardDetailPage({ params }: Props) {
 
   const { deck, card, prevCard, nextCard } = result;
 
-  const annotations = (card.annotations ?? []).map((a: { _id: { toString(): string }; x: number; y: number; title: string; description: string; order: number }) => ({
-    _id: a._id.toString(),
-    x: a.x,
-    y: a.y,
-    title: a.title,
-    description: a.description,
-    order: a.order,
-  }));
+  const annotations = (card.annotations ?? []).map(
+    (a: {
+      _id: { toString(): string };
+      x: number;
+      y: number;
+      title: string;
+      description: string;
+      order: number;
+    }) => ({
+      _id: a._id.toString(),
+      x: a.x,
+      y: a.y,
+      title: a.title,
+      description: a.description,
+      order: a.order,
+    }),
+  );
 
   const hasAnnotations = annotations.length > 0;
 
   return (
-    <div className={`mx-auto space-y-6 ${hasAnnotations ? "max-w-3xl" : "max-w-lg"}`}>
+    <div
+      className={`mx-auto space-y-6 ${hasAnnotations ? "max-w-3xl" : "max-w-lg"}`}
+    >
       <Link
         href={`/baralhos/${id}`}
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -40,6 +51,14 @@ export default async function CardDetailPage({ params }: Props) {
       </Link>
 
       <div className="flex flex-col items-center gap-4">
+        <h2 className="text-2xl font-semibold text-center">{card.title}</h2>
+
+        {card.description && (
+          <RichTextViewer
+            content={card.description}
+            className="text-muted-foreground text-center"
+          />
+        )}
         {hasAnnotations ? (
           <CardAnnotationsViewer
             image={card.image!}
@@ -49,7 +68,9 @@ export default async function CardDetailPage({ params }: Props) {
         ) : (
           <div
             className="relative max-w-sm max-h-96 rounded-lg overflow-hidden bg-muted shadow-md"
-            style={{ aspectRatio: parseAspectRatio(deck.cardAspectRatio).cssValue }}
+            style={{
+              aspectRatio: parseAspectRatio(deck.cardAspectRatio).cssValue,
+            }}
           >
             {card.image ? (
               <img
@@ -63,12 +84,6 @@ export default async function CardDetailPage({ params }: Props) {
               </div>
             )}
           </div>
-        )}
-
-        <h2 className="text-2xl font-semibold text-center">{card.title}</h2>
-
-        {card.description && (
-          <RichTextViewer content={card.description} className="text-muted-foreground text-center" />
         )}
       </div>
 

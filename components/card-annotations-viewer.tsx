@@ -169,7 +169,7 @@ export function CardAnnotationsViewer({
                 <button
                   key={ann._id}
                   type="button"
-                  className={`absolute right-0 max-w-[130px] cursor-pointer rounded px-2 py-1 text-right text-xs font-medium transition-colors ${
+                  className={`absolute right-0 w-[230px] cursor-pointer rounded px-2 py-1 text-right text-xs font-medium transition-colors ${
                     activeId === ann._id
                       ? "bg-foreground text-background"
                       : "text-foreground/80 hover:text-foreground"
@@ -236,7 +236,7 @@ export function CardAnnotationsViewer({
                 <button
                   key={ann._id}
                   type="button"
-                  className={`absolute left-0 max-w-[130px] cursor-pointer rounded px-2 py-1 text-left text-xs font-medium transition-colors ${
+                  className={`absolute left-0 w-[230px] cursor-pointer rounded px-2 py-1 text-left text-xs font-medium transition-colors ${
                     activeId === ann._id
                       ? "bg-foreground text-background"
                       : "text-foreground/80 hover:text-foreground"

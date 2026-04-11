@@ -139,14 +139,21 @@ export default async function LeiturasPage({ searchParams }: Props) {
                     <span className="text-sm font-medium">
                       {deck?.name ?? "Baralho removido"}
                     </span>
+                    {reading.mode === "practice" && (
+                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                        Treino
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       {formatDate(reading.createdAt)}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground truncate">
-                    {reading.context.length > 100
-                      ? reading.context.slice(0, 100) + "..."
-                      : reading.context}
+                    {reading.mode === "practice"
+                      ? `Pergunta: ${reading.context.slice(0, 90)}${reading.context.length > 90 ? "..." : ""}`
+                      : reading.context.length > 100
+                        ? reading.context.slice(0, 100) + "..."
+                        : reading.context}
                   </p>
                 </div>
               </Link>

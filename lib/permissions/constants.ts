@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   ADMIN_PLANS: "admin:plans",
   ADMIN_USERS: "admin:users",
   ADMIN_DECKS: "admin:decks",
+  ADMIN_PRACTICE_QUESTIONS: "admin:practice_questions",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
