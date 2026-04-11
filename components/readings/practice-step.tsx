@@ -56,7 +56,7 @@ export function PracticeStep({
     (async () => {
       const result = await drawPracticeQuestionAction({ deckId });
       if (result.text) {
-        setQuestionText(result.text);
+        setQuestionText((prev) => (prev.length > 0 ? prev : result.text));
         setLastDrawnId(result.id);
         setLastDrawnText(result.text);
         setHasAnyEligible(true);
@@ -152,7 +152,7 @@ export function PracticeStep({
             onChange={(e) => setQuestionText(e.target.value)}
             rows={3}
             placeholder="Escreva uma pergunta para treinar sua interpretação"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isDrawing}
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
           />
         </div>
@@ -179,7 +179,7 @@ export function PracticeStep({
         <Button
           onClick={handleSubmit}
           disabled={
-            isSubmitting || !questionText.trim() || !userAnswer.trim()
+            isSubmitting || isDrawing || !questionText.trim() || !userAnswer.trim()
           }
           className="w-full"
         >
