@@ -40,7 +40,12 @@ export default async function DecksPage() {
         <TableBody>
           {decks.map((deck) => (
             <TableRow key={deck._id.toString()}>
-              <TableCell className="font-medium">{deck.name}</TableCell>
+              <TableCell className="font-medium">
+                {deck.name}
+                {deck.availableForDailyCard && (
+                  <Badge variant="default" className="ml-2">Baralho do dia</Badge>
+                )}
+              </TableCell>
               <TableCell>
                 <Badge variant="secondary">
                   {DECK_TYPE_LABELS[deck.type as DeckType] ?? deck.type}
