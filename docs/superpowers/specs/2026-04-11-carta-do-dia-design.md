@@ -102,8 +102,14 @@ This function is the single entry point called by both the dashboard widget (Ser
 7. if !card: return null                                 // edge case: empty deck
 8. if !card.dailyReflection:
      try:
-       card.dailyReflection = await aiProvider.generateDailyCardReflection(card)
-       deck.save()                                       // cache persisted on the subdoc
+       reflection = await aiProvider.generateDailyCardReflection(card)
+       // Persist with a positional update rather than deck.save() to avoid
+       // lost-write races with concurrent first-draws of the same card.
+       Deck.updateOne(
+         { _id: deck._id, "cards._id": card._id },
+         { $set: { "cards.$.dailyReflection": reflection } }
+       )
+       card.dailyReflection = reflection                  // also reflect in local copy
      catch:
        // swallow — DailyCard is still created below, reflection stays null
 9. try:
@@ -185,6 +191,7 @@ Empty state (no active deck): friendly message "Nenhum baralho do dia configurad
 - Deep-linkable by date (URL format `YYYY-MM-DD`)
 - Renders the same shape as the dedicated page (large card, name, reflection)
 - Uses the live card + `dailyReflection` if resolvable, otherwise the snapshot (and hides the reflection block if the card no longer exists)
+- If the user has no `DailyCard` for that date, render a Next.js `notFound()` (404)
 
 ### Admin — deck toggle
 
