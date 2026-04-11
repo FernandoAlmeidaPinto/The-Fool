@@ -17,6 +17,7 @@ export interface AIProvider {
     questionText: string,
     userAnswer: string
   ): Promise<string>;
+  generateDailyCardReflection(card: CardData): Promise<string>;
 }
 
 import { MockProvider } from "./mock-provider";

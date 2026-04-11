@@ -25,4 +25,8 @@ export class MockProvider implements AIProvider {
     const base = baseCombination ? " (considerando a combinação base)" : "";
     return `<p><strong>Feedback sobre sua interpretação</strong>${base}:</p><p>Você trouxe boas conexões entre as cartas <strong>${titles}</strong> ao responder <em>"${questionText}"</em>. Um ponto forte da sua resposta foi o esforço de costurar uma narrativa — ${userAnswer.length} caracteres mostram dedicação. Como sugestão, tente explorar mais os símbolos individuais de cada carta antes de fechar a leitura conjunta.</p>`;
   }
+
+  async generateDailyCardReflection(card: CardData): Promise<string> {
+    return `<p>A carta <strong>${card.title}</strong> convida você a fazer uma pausa e olhar para dentro. Respire fundo e permita que a sua mensagem atravesse o dia com você.</p><p>Deixe que o símbolo desta carta seja um farol silencioso nas pequenas escolhas de hoje.</p>`;
+  }
 }
