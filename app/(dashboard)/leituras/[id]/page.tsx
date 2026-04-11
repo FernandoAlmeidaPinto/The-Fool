@@ -104,7 +104,7 @@ export default async function ReadingResultPage({ params }: Props) {
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Interpretação para você</h3>
         <div className="rounded-lg border border-border p-4">
-          <RichTextViewer content={interpretation.answer} className="text-sm" />
+          <RichTextViewer content={interpretation.answer ?? ""} className="text-sm" />
         </div>
       </div>
     </div>
