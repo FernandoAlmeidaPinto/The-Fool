@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MongoServerError } from "mongodb";
 import { connectDB } from "@/lib/db/mongoose";
 import { DailyCard, type IDailyCard } from "./model";
 import { dateInSaoPaulo } from "./date";
@@ -55,7 +56,6 @@ export async function getOrCreateToday(
         card._id.toString(),
         reflection
       );
-      card.dailyReflection = reflection;
     } catch (err) {
       // Non-fatal: the DailyCard is still created below; reflection stays
       // null and a later draw of the same card will retry.
@@ -73,13 +73,9 @@ export async function getOrCreateToday(
       revealedAt: null,
     });
     return created.toObject();
-  } catch (err: unknown) {
+  } catch (err) {
     // Duplicate key: lost a race with a concurrent first-visit. Re-read.
-    if (
-      err instanceof Error &&
-      "code" in err &&
-      (err as { code?: number }).code === 11000
-    ) {
+    if (err instanceof MongoServerError && err.code === 11000) {
       return DailyCard.findOne({ userId, date: today }).lean();
     }
     throw err;
