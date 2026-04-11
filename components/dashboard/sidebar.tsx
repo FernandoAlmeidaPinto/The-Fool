@@ -13,6 +13,7 @@ import {
   CreditCard,
   Crown,
   MessageCircleQuestionMark,
+  Sun,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarSection } from "./sidebar-section";
@@ -43,6 +44,7 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
       <nav className="space-y-1">
         <SidebarItem href="/" label="Dashboard" icon={LayoutDashboard} onNavigate={onNavigate} />
         <SidebarItem href="/leituras" label="Leituras" icon={Sparkles} onNavigate={onNavigate} />
+        <SidebarItem href="/carta-do-dia" label="Carta do Dia" icon={Sun} onNavigate={onNavigate} />
         <SidebarItem href="/cursos" label="Cursos" icon={BookOpen} onNavigate={onNavigate} />
         <SidebarItem href="/baralhos" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
       </nav>
