@@ -114,6 +114,75 @@ export async function createReading(data: {
   return interpretation.toObject();
 }
 
+export async function createPracticeAttempt(data: {
+  userId: string;
+  deckId: string;
+  cardIds: string[];
+  questionText: string;
+  userAnswer: string;
+}): Promise<IUserInterpretation> {
+  await connectDB();
+
+  const { userId, deckId, cardIds, questionText, userAnswer } = data;
+
+  // Validate inputs
+  if (!questionText.trim()) {
+    throw new Error("Pergunta de treino é obrigatória");
+  }
+  if (!userAnswer.trim()) {
+    throw new Error("Resposta é obrigatória");
+  }
+  if (cardIds.length < 2 || cardIds.length > 5) {
+    throw new Error("Selecione entre 2 e 5 cartas");
+  }
+
+  // Fetch deck and validate cards exist
+  const deck = await Deck.findById(deckId).lean();
+  if (!deck) throw new Error("Baralho não encontrado");
+
+  const deckCardIds = new Set(deck.cards.map((c) => c._id.toString()));
+  for (const cardId of cardIds) {
+    if (!deckCardIds.has(cardId)) {
+      throw new Error("Uma ou mais cartas não pertencem a este baralho");
+    }
+  }
+
+  // Build card data
+  const cards: CardData[] = cardIds.map((cardId) => {
+    const card = deck.cards.find((c) => c._id.toString() === cardId)!;
+    return {
+      _id: card._id.toString(),
+      title: card.title,
+      description: card.description,
+    };
+  });
+
+  const cardKey = buildCardKey(cardIds);
+  const combination = await getOrCreateCombination(deckId, cards, cardIds, cardKey);
+
+  const provider = getAIProvider();
+  const feedback = await provider.generatePracticeFeedback(
+    cards,
+    combination.answer ?? null,
+    questionText.trim(),
+    userAnswer.trim()
+  );
+
+  const interpretation = await UserInterpretation.create({
+    userId,
+    deckId,
+    cardIds,
+    cardKey,
+    context: questionText.trim(), // snapshot of the practice question
+    combinationId: combination._id,
+    mode: "practice",
+    userAnswer: userAnswer.trim(),
+    feedback,
+  });
+
+  return interpretation.toObject();
+}
+
 export async function getInterpretationById(
   id: string
 ): Promise<IUserInterpretation | null> {
