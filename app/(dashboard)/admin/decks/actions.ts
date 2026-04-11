@@ -4,11 +4,12 @@ import { randomUUID } from "crypto";
 import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
-import { createDeck, updateDeck, addCard, updateCard, getDeckById } from "@/lib/decks/service";
+import { createDeck, updateDeck, addCard, updateCard, getDeckById, setAsDailyDeck } from "@/lib/decks/service";
 import { uploadFile, validateImage, processCardImage } from "@/lib/storage/s3";
 import { parseAspectRatio } from "@/lib/decks/constants";
 import { sanitizeHtml } from "@/lib/html/sanitize";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 async function requireDecksPermission() {
   const session = await auth();
@@ -147,4 +148,14 @@ export async function updateCardAction(formData: FormData) {
 
   await updateCard(deckId, cardId, data);
   redirect(`/admin/decks/${deckId}/edit`);
+}
+
+export async function setAsDailyDeckAction(formData: FormData) {
+  await requireDecksPermission();
+  const deckId = formData.get("deckId") as string;
+  const enabled = formData.get("enabled") === "true";
+  if (!deckId) throw new Error("Deck id é obrigatório");
+  await setAsDailyDeck(enabled ? deckId : null);
+  revalidatePath("/admin/decks/" + deckId + "/edit");
+  revalidatePath("/admin/decks");
 }

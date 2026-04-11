@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CardThumbnail } from "@/components/card-thumbnail";
 import Link from "next/link";
-import { updateDeckAction } from "../../actions";
+import { updateDeckAction, setAsDailyDeckAction } from "../../actions";
 
 export default async function EditDeckPage({
   params,
@@ -79,6 +79,35 @@ export default async function EditDeckPage({
               </p>
             </div>
             <Button type="submit">Salvar Alterações</Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="max-w-2xl">
+        <CardHeader>
+          <CardTitle>Carta do Dia</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action={setAsDailyDeckAction} className="flex items-center gap-4">
+            <input type="hidden" name="deckId" value={deck._id.toString()} />
+            <input
+              type="hidden"
+              name="enabled"
+              value={deck.availableForDailyCard ? "false" : "true"}
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Usar como baralho do dia</p>
+              <p className="text-xs text-muted-foreground">
+                Apenas um baralho pode estar ativo por vez. Ativar este desativa o anterior.
+              </p>
+            </div>
+            <Button
+              type="submit"
+              variant={deck.availableForDailyCard ? "outline" : "default"}
+              size="sm"
+            >
+              {deck.availableForDailyCard ? "Desativar" : "Ativar"}
+            </Button>
           </form>
         </CardContent>
       </Card>
