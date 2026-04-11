@@ -36,7 +36,8 @@ export function NewReadingWizard({
   quotaLimit,
 }: NewReadingWizardProps) {
   const router = useRouter();
-  const [step, setStep] = useState<WizardStep>("deck");
+  const [step, setStep] = useState<WizardStep>("choice");
+  const [readingPath, setReadingPath] = useState<ReadingPath | null>(null);
   const [selectedDeck, setSelectedDeck] = useState<DeckForWizard | null>(null);
   const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
   const [context, setContext] = useState("");
@@ -60,7 +61,8 @@ export function NewReadingWizard({
   };
 
   const handleChoose = (path: ReadingPath) => {
-    setStep(path === "practice" ? "practice" : "normal");
+    setReadingPath(path);
+    setStep("deck");
   };
 
   const handleSubmitNormal = () => {
@@ -112,9 +114,17 @@ export function NewReadingWizard({
         </div>
       )}
 
+      {/* Step: Choice (first step) */}
+      {step === "choice" && (
+        <PathChoice onChoose={handleChoose} />
+      )}
+
       {/* Step: Select Deck */}
       {step === "deck" && (
         <div className="space-y-4">
+          <Button variant="ghost" onClick={() => setStep("choice")}>
+            ← Voltar
+          </Button>
           <p className="text-sm text-muted-foreground">
             Escolha o baralho para sua leitura:
           </p>
@@ -226,25 +236,12 @@ export function NewReadingWizard({
 
           <div className="flex justify-end">
             <Button
-              onClick={() => setStep("choice")}
+              onClick={() => setStep(readingPath === "practice" ? "practice" : "normal")}
               disabled={selectedCardIds.length < 2}
             >
               Continuar
             </Button>
           </div>
-        </div>
-      )}
-
-      {/* Step: Choice */}
-      {step === "choice" && selectedDeck && (
-        <div className="space-y-4">
-          <Button variant="ghost" onClick={() => setStep("cards")}>
-            ← Voltar para seleção
-          </Button>
-          <div className="rounded-lg border border-border p-4">
-            {selectedCardsSummary}
-          </div>
-          <PathChoice onChoose={handleChoose} />
         </div>
       )}
 
@@ -259,7 +256,7 @@ export function NewReadingWizard({
             cardIds={selectedCardIds}
             quotaUsed={quotaUsed}
             quotaLimit={quotaLimit}
-            onBack={() => setStep("choice")}
+            onBack={() => setStep("cards")}
           />
         </div>
       )}
@@ -267,7 +264,7 @@ export function NewReadingWizard({
       {/* Step: Normal (write question + submit) */}
       {step === "normal" && selectedDeck && (
         <div className="space-y-4">
-          <Button variant="ghost" onClick={() => setStep("choice")}>
+          <Button variant="ghost" onClick={() => setStep("cards")}>
             ← Voltar
           </Button>
 
