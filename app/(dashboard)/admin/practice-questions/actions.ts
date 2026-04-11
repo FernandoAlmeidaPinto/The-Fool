@@ -27,8 +27,6 @@ export async function createPracticeQuestionAction(formData: FormData) {
   const deckIdRaw = (formData.get("deckId") as string | null)?.trim() ?? "";
   const active = formData.get("active") === "on";
 
-  if (!text) throw new Error("Texto da pergunta é obrigatório");
-
   await createPracticeQuestion({
     text,
     deckId: deckIdRaw === "" || deckIdRaw === "global" ? null : deckIdRaw,
@@ -47,8 +45,6 @@ export async function updatePracticeQuestionAction(formData: FormData) {
   const text = (formData.get("text") as string | null)?.trim() ?? "";
   const deckIdRaw = (formData.get("deckId") as string | null)?.trim() ?? "";
   const active = formData.get("active") === "on";
-
-  if (!text) throw new Error("Texto da pergunta é obrigatório");
 
   await updatePracticeQuestion(id, {
     text,

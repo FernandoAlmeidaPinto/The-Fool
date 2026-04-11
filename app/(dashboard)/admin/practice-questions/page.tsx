@@ -7,6 +7,7 @@ import { listDecks } from "@/lib/decks/service";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import mongoose from "mongoose";
 import {
   Table,
   TableBody,
@@ -45,7 +46,9 @@ export default async function PracticeQuestionsPage({ searchParams }: Props) {
       ? "any"
       : deckParam === "global"
         ? "global"
-        : deckParam;
+        : mongoose.Types.ObjectId.isValid(deckParam)
+          ? deckParam
+          : "any";
 
   const activeFilter: boolean | "any" =
     statusParam === "active"
@@ -67,6 +70,14 @@ export default async function PracticeQuestionsPage({ searchParams }: Props) {
   const deckMap = new Map(decks.map((d) => [d._id.toString(), d.name]));
 
   const totalPages = Math.max(1, Math.ceil(result.total / PER_PAGE));
+
+  const buildHref = (p: number) => {
+    const sp = new URLSearchParams();
+    sp.set("page", String(p));
+    if (deckParam) sp.set("deck", deckParam);
+    if (statusParam) sp.set("status", statusParam);
+    return `/admin/practice-questions?${sp.toString()}`;
+  };
 
   return (
     <div>
@@ -166,7 +177,7 @@ export default async function PracticeQuestionsPage({ searchParams }: Props) {
         <div className="flex items-center justify-center gap-4 mt-6">
           {page > 1 && (
             <Link
-              href={`/admin/practice-questions?page=${page - 1}${deckParam ? `&deck=${deckParam}` : ""}${statusParam ? `&status=${statusParam}` : ""}`}
+              href={buildHref(page - 1)}
               className="text-sm underline"
             >
               Anterior
@@ -177,7 +188,7 @@ export default async function PracticeQuestionsPage({ searchParams }: Props) {
           </span>
           {page < totalPages && (
             <Link
-              href={`/admin/practice-questions?page=${page + 1}${deckParam ? `&deck=${deckParam}` : ""}${statusParam ? `&status=${statusParam}` : ""}`}
+              href={buildHref(page + 1)}
               className="text-sm underline"
             >
               Próxima
