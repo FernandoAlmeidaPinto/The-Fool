@@ -24,6 +24,7 @@ export interface ICard extends mongoose.Document {
   description: string;
   image: string;
   order: number;
+  dailyReflection: string | null;
   annotations: mongoose.Types.DocumentArray<IAnnotation>;
 }
 
@@ -32,6 +33,7 @@ const CardSchema = new Schema<ICard>({
   description: { type: String, default: "" },
   image: { type: String, required: true },
   order: { type: Number, required: true, default: 0 },
+  dailyReflection: { type: String, default: null },
   annotations: { type: [AnnotationSchema], default: [] },
 });
 
@@ -42,6 +44,7 @@ export interface IDeck {
   type: string;
   cardAspectRatio: string;
   coverImage: string | null;
+  availableForDailyCard: boolean;
   cards: mongoose.Types.DocumentArray<ICard>;
   createdAt: Date;
   updatedAt: Date;
@@ -58,6 +61,7 @@ const DeckSchema = new Schema<IDeck>(
     },
     cardAspectRatio: { type: String, default: "2/3" },
     coverImage: { type: String, default: null },
+    availableForDailyCard: { type: Boolean, default: false, index: true },
     cards: { type: [CardSchema], default: [] },
   },
   { timestamps: true }
