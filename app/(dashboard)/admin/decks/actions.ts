@@ -156,6 +156,8 @@ export async function setAsDailyDeckAction(formData: FormData) {
   const enabled = formData.get("enabled") === "true";
   if (!deckId) throw new Error("Deck id é obrigatório");
   await setAsDailyDeck(enabled ? deckId : null);
-  revalidatePath("/admin/decks/" + deckId + "/edit");
+  revalidatePath(`/admin/decks/${deckId}/edit`);
   revalidatePath("/admin/decks");
+  revalidatePath("/");
+  revalidatePath("/carta-do-dia");
 }
