@@ -11,6 +11,41 @@ function buildCardKey(cardIds: string[]): string {
   return cardIds.map((id) => id.toString()).join("_");
 }
 
+async function getOrCreateCombination(
+  deckId: string,
+  cards: CardData[],
+  cardIds: string[],
+  cardKey: string
+): Promise<ICardCombination> {
+  const provider = getAIProvider();
+
+  let combination = await CardCombination.findOne({ deckId, cardKey }).lean();
+
+  if (!combination) {
+    const answer = await provider.generateCombination(cards);
+    combination = await CardCombination.findOneAndUpdate(
+      { deckId, cardKey },
+      {
+        $setOnInsert: {
+          deckId,
+          cardIds,
+          cardKey,
+          answer,
+          status: "generated",
+          source: "ai",
+        },
+      },
+      { upsert: true, new: true }
+    ).lean();
+
+    if (!combination) {
+      throw new Error("Falha ao criar combinação de cartas");
+    }
+  }
+
+  return combination;
+}
+
 export async function createReading(data: {
   userId: string;
   deckId: string;
@@ -53,33 +88,9 @@ export async function createReading(data: {
   });
 
   const cardKey = buildCardKey(cardIds);
+  const combination = await getOrCreateCombination(deckId, cards, cardIds, cardKey);
+
   const provider = getAIProvider();
-
-  // Find or create card combination
-  let combination = await CardCombination.findOne({ deckId, cardKey }).lean();
-
-  if (!combination) {
-    const answer = await provider.generateCombination(cards);
-    // Upsert to handle concurrent requests for same combination
-    combination = await CardCombination.findOneAndUpdate(
-      { deckId, cardKey },
-      {
-        $setOnInsert: {
-          deckId,
-          cardIds,
-          cardKey,
-          answer,
-          status: "generated",
-          source: "ai",
-        },
-      },
-      { upsert: true, new: true }
-    ).lean();
-
-    if (!combination) {
-      throw new Error("Falha ao criar combinação de cartas");
-    }
-  }
 
   // Generate contextual interpretation (always new)
   const interpretationAnswer = await provider.generateInterpretation(
@@ -97,6 +108,7 @@ export async function createReading(data: {
     context,
     answer: interpretationAnswer,
     combinationId: combination._id,
+    mode: "normal",
   });
 
   return interpretation.toObject();
