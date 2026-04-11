@@ -113,8 +113,8 @@ export default async function ReadingResultPage({ params }: Props) {
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Sua resposta</h3>
             <div className="rounded-lg border border-border p-4">
-              <p className="text-sm whitespace-pre-wrap">
-                {interpretation.userAnswer}
+              <p className="text-sm whitespace-pre-wrap break-words">
+                {interpretation.userAnswer ?? ""}
               </p>
             </div>
           </div>
