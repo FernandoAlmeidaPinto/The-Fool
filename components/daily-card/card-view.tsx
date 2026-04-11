@@ -1,4 +1,5 @@
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 
 interface DailyCardViewProps {
   name: string;
@@ -31,10 +32,7 @@ export function DailyCardView({
       </div>
       <h1 className="text-center text-2xl font-semibold text-foreground">{name}</h1>
       {reflection ? (
-        <div
-          className="prose prose-sm max-w-none text-center text-foreground"
-          dangerouslySetInnerHTML={{ __html: reflection }}
-        />
+        <RichTextViewer content={reflection} className="max-w-none text-center" />
       ) : (
         <p className="text-sm italic text-muted-foreground">
           Reflexão em preparação, volte daqui a pouco.

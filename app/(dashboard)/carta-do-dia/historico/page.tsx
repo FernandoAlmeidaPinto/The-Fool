@@ -5,6 +5,7 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { getHistory, resolveLiveCard } from "@/lib/daily-card/service";
 import { Button } from "@/components/ui/button";
+import { parseAspectRatio } from "@/lib/decks/constants";
 
 const PAGE_SIZE = 30;
 
@@ -31,6 +32,7 @@ export default async function HistoricoPage({
         dc,
         name: live?.card.title ?? dc.cardSnapshot.name,
         imageUrl: live?.card.image ?? dc.cardSnapshot.imageUrl,
+        aspectRatio: parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue,
       };
     })
   );
@@ -48,13 +50,13 @@ export default async function HistoricoPage({
         <p className="text-muted-foreground">Ainda não há cartas no seu histórico.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {resolved.map(({ dc, name, imageUrl }) => (
+          {resolved.map(({ dc, name, imageUrl, aspectRatio }) => (
             <Link
               key={dc._id.toString()}
               href={`/carta-do-dia/historico/${dc.date}`}
               className="group flex flex-col gap-2"
             >
-              <div className="relative overflow-hidden rounded-md border border-border" style={{ aspectRatio: "2/3" }}>
+              <div className="relative overflow-hidden rounded-md border border-border" style={{ aspectRatio }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imageUrl} alt={name} className="h-full w-full object-contain opacity-80 transition-opacity group-hover:opacity-100" />
               </div>
