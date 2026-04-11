@@ -15,6 +15,9 @@ export const PERMISSIONS = {
   ADMIN_USERS: "admin:users",
   ADMIN_DECKS: "admin:decks",
   ADMIN_PRACTICE_QUESTIONS: "admin:practice_questions",
+
+  // Daily card
+  DAILY_CARD_READ: "daily-card:read",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -25,7 +25,7 @@ async function seed() {
       name: "Free Tier",
       slug: "free_tier",
       description: "Basic free access",
-      permissions: [PERMISSIONS.READINGS_VIEW, PERMISSIONS.READINGS_CREATE],
+      permissions: [PERMISSIONS.READINGS_VIEW, PERMISSIONS.READINGS_CREATE, PERMISSIONS.DAILY_CARD_READ],
     },
     { upsert: true, new: true }
   );
