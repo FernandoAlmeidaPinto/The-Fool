@@ -102,11 +102,7 @@ export function ImageCropUpload({
       {currentImage && !imageSrc && !croppedPreview && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">Imagem atual:</p>
-          <img
-            src={currentImage}
-            alt="Imagem atual"
-            className="max-w-xs max-h-48 rounded-md border border-border object-contain"
-          />
+          
         </div>
       )}
 
@@ -154,11 +150,7 @@ export function ImageCropUpload({
       {croppedPreview && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">Imagem recortada:</p>
-          <img
-            src={croppedPreview}
-            alt="Preview recortado"
-            className={`max-w-xs max-h-64 border border-border object-contain ${circular ? "rounded-full" : "rounded-md"}`}
-          />
+
           <Button type="button" variant="outline" size="sm" onClick={reset}>
             Escolher outra imagem
           </Button>

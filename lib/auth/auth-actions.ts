@@ -8,31 +8,34 @@ import { User } from "@/lib/users/model";
 import { signIn, signOut } from "@/lib/auth/auth";
 import { getProfileBySlug } from "@/lib/profiles/service";
 
-export async function register(formData: FormData): Promise<void> {
+export async function register(
+  _prevState: { error: string } | null,
+  formData: FormData
+): Promise<{ error: string } | null> {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   if (!name || !email || !password) {
-    throw new Error("All fields are required");
+    return { error: "Todos os campos são obrigatórios" };
   }
 
   if (password.length < 8) {
-    throw new Error("Password must be at least 8 characters");
+    return { error: "A senha deve ter pelo menos 8 caracteres" };
   }
 
   await connectDB();
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Error("Email already registered");
+    return { error: "Este email já está cadastrado" };
   }
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
   const freeTierProfile = await getProfileBySlug("free_tier");
   if (!freeTierProfile) {
-    throw new Error("Free tier profile not found. Run 'yarn seed' first.");
+    return { error: "Perfil free_tier não encontrado. Execute 'yarn seed' primeiro." };
   }
 
   await User.create({
@@ -49,14 +52,19 @@ export async function register(formData: FormData): Promise<void> {
     password,
     redirectTo: "/",
   });
+
+  return null;
 }
 
-export async function loginWithCredentials(formData: FormData): Promise<void> {
+export async function loginWithCredentials(
+  _prevState: { error: string } | null,
+  formData: FormData
+): Promise<{ error: string } | null> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   if (!email || !password) {
-    throw new Error("Email and password are required");
+    return { error: "Email e senha são obrigatórios" };
   }
 
   try {
@@ -71,10 +79,12 @@ export async function loginWithCredentials(formData: FormData): Promise<void> {
       throw error;
     }
     if (error instanceof AuthError) {
-      throw new Error("Invalid email or password");
+      return { error: "Email ou senha inválidos" };
     }
     throw error;
   }
+
+  return null;
 }
 
 export async function loginWithGoogle() {
