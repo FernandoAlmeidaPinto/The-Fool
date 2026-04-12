@@ -40,7 +40,7 @@ export function EditorialLayout({
       {/* Date block */}
       <header className="mb-10 text-center font-display">
         <p className="text-sm italic text-muted-foreground">{dateWeekday}</p>
-        <p className="mt-1 text-2xl font-bold tracking-[0.2em] text-foreground sm:text-3xl">
+        <p className="mt-1 text-2xl font-bold tracking-[0.2em] text-foreground sm:text-[32px]">
           {dateDayMonth}
         </p>
         <p className="mt-1 text-sm tracking-[0.3em] text-muted-foreground">
