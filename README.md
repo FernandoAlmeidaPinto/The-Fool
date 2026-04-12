@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Fool
 
-## Getting Started
+Plataforma de aprendizado de tarot com leituras guiadas por IA, carta do dia, diário espiritual e exploração interativa de baralhos.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + React 19 + TypeScript
+- **Tailwind CSS 4** + shadcn/ui (design system Ivory & Charcoal)
+- **Auth.js v5** — JWT sessions, login com email/senha e Google OAuth
+- **MongoDB** + Mongoose
+- **MinIO** (S3) — armazenamento de imagens
+- **TipTap** — editor de texto rico
+- **Sharp** — processamento de imagens
+
+## Funcionalidades
+
+### Carta do Dia
+
+Sorteio diário de uma carta de tarot (uma por usuário por dia, fuso de São Paulo). Inclui reflexão editorial e histórico navegável por data.
+
+### Leituras de Tarot
+
+Wizard de leitura com interpretação por IA, modo prática com feedback e combinações de cartas. Quota de leituras por plano.
+
+### Diário Espiritual
+
+Diário pessoal com três tipos de entrada: reflexão da carta do dia, anotação de leitura e texto livre. Suporte a paginação e arquivamento.
+
+### Baralhos & Cartas
+
+Exploração de baralhos com grid de cartas e visualização detalhada. Anotações interativas posicionadas por clique (editor admin), exibidas com linhas SVG (desktop) e pontos numerados (mobile).
+
+### Perfil & Planos
+
+Gerenciamento de perfil do usuário (nome, avatar, data de nascimento) e visualização de planos disponíveis. Integração com pagamento pendente.
+
+### Painel Admin
+
+CRUD completo para perfis, planos, baralhos, cartas, anotações, perguntas de prática e gerenciamento de usuários.
+
+## Pré-requisitos
+
+- Node.js 20+
+- Yarn
+- Docker & Docker Compose
+
+## Setup
+
+1. Clone o repositório e instale as dependências:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url>
+cd the_fool
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configure as variáveis de ambiente:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+# Edite .env com seus valores (AUTH_SECRET, Google OAuth, etc.)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Inicie os serviços de infraestrutura:
 
-## Learn More
+```bash
+docker compose up -d  # MongoDB + MinIO
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Popule o banco com dados iniciais:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn seed  # Cria perfis admin e free_tier
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Inicie o servidor de desenvolvimento:
 
-## Deploy on Vercel
+```bash
+yarn dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+| Comando | Descrição |
+|---------|-----------|
+| `yarn dev` | Servidor de desenvolvimento com hot reload |
+| `yarn build` | Build de produção |
+| `yarn start` | Servidor de produção |
+| `yarn lint` | Linting com ESLint |
+| `yarn seed` | Seed do banco de dados |
+| `docker compose up -d` | Iniciar MongoDB + MinIO |
+| `docker compose down` | Parar MongoDB + MinIO |
+
+## Variáveis de Ambiente
+
+| Variável | Descrição |
+|----------|-----------|
+| `MONGODB_URI` | URI de conexão do MongoDB |
+| `AUTH_SECRET` | Secret do Auth.js (`openssl rand -base64 32`) |
+| `AUTH_GOOGLE_ID` | Client ID do Google OAuth |
+| `AUTH_GOOGLE_SECRET` | Client Secret do Google OAuth |
+| `NEXTAUTH_URL` | URL base da aplicação |
+| `S3_ENDPOINT` | Endpoint do MinIO/S3 |
+| `S3_ACCESS_KEY` | Access key do MinIO/S3 |
+| `S3_SECRET_KEY` | Secret key do MinIO/S3 |
+| `S3_BUCKET` | Nome do bucket para imagens |
+| `S3_REGION` | Região do S3 |

@@ -70,7 +70,7 @@ export default async function NovaDiarioPage({
 
   // --- Fetch recent normal-mode readings (last 30), filter those already with an entry ---
   const { items: recentReadingItems } = await listUserInterpretations(userId, 1, 30);
-  const normalReadings = recentReadingItems.filter((r) => r.mode === "normal");
+  const normalReadings = recentReadingItems.filter((r) => r.mode !== "practice");
 
   const readingOptions: ReadingOption[] = [];
   for (const reading of normalReadings) {

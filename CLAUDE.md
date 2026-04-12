@@ -39,25 +39,43 @@ No test framework is configured yet.
 app/
   (dashboard)/              # Authenticated pages (sidebar + header layout)
     page.tsx                # Dashboard home
-    leituras/               # Stub: "Em breve"
-    cursos/                 # Stub: "Em breve"
-    perfil/                 # Stub: "Em breve"
-    configuracoes/          # Stub: "Em breve"
     baralhos/               # Public deck/card browsing
       [id]/                 # Card grid
         carta/[cardId]/     # Card detail with annotations viewer
+    carta-do-dia/           # Daily card draw & reflection
+      historico/            # History of past daily cards
+        [date]/             # Specific day's card detail
+    diario/                 # Spiritual diary (journal)
+      nova/                 # Create new entry (daily-card, reading, free)
+      [id]/                 # View single entry with archive toggle
+      arquivadas/           # Archived entries list
+    leituras/               # Tarot readings
+      nova/                 # New reading wizard
+      [id]/                 # Reading detail
+    planos/                 # Available plans & subscriptions
+    perfil/                 # User profile management
+    cursos/                 # Stub: "Em breve"
+    configuracoes/          # Stub: "Em breve"
     admin/                  # Admin pages (permission-gated)
       profiles/             # Profile CRUD
       plans/                # Plan CRUD
       decks/                # Deck + Card + Annotation CRUD
+        [id]/combinacoes/   # Card combination review
+      practice-questions/   # Practice question CRUD
+      users/                # User management
   auth/                     # Login/register (outside dashboard layout)
   api/                      # Route Handlers
     auth/[...nextauth]/     # Auth.js handler
     health/                 # Health check
 components/
-  ui/                       # shadcn/ui components
+  ui/                       # shadcn/ui components (+ rich-text-editor, rich-text-viewer)
   dashboard/                # Sidebar, header, page-title, mobile-sidebar
-  admin/                    # Admin-specific components (annotation-editor)
+  admin/                    # Admin components (annotation-editor, combination-review-list)
+  daily-card/               # Card view, editorial layout, widget
+  diary/                    # Entry form
+  readings/                 # New reading wizard, path choice, practice step
+  plans/                    # Plan card
+  profile/                  # Profile form
   card-thumbnail.tsx        # Reusable card grid item
   card-annotations-viewer.tsx # Public annotations display
   image-crop-upload.tsx     # Image crop before upload
@@ -68,16 +86,35 @@ lib/
   auth/auth.ts              # Auth.js config, JWT callbacks with permissions
   auth/auth-actions.ts      # Server Actions: register, login, logout
   users/model.ts            # User schema (profileId ref)
+  users/service.ts          # User CRUD
   permissions/constants.ts  # PERMISSIONS enum (resource:action format)
   permissions/check.ts      # hasPermission(), hasAnyPermission()
   profiles/model.ts         # Profile schema (name, slug, permissions[])
   profiles/service.ts       # Profile CRUD
   plans/model.ts            # Plan schema (price in cents, profileId ref)
   plans/service.ts          # Plan CRUD
+  subscriptions/model.ts    # Subscription schema (userId, planId, status, dates)
+  subscriptions/service.ts  # Subscription management
   decks/model.ts            # Deck schema with Card + Annotation subdocs
   decks/constants.ts        # DECK_TYPES, ASPECT_RATIO_PRESETS, parseAspectRatio
   decks/service.ts          # Deck/Card/Annotation CRUD
+  daily-card/model.ts       # DailyCard schema (one draw per user per day)
+  daily-card/service.ts     # Daily card draw & history
+  daily-card/date.ts        # Date utilities (America/Sao_Paulo timezone)
+  daily-card/reflection.ts  # Reflection generation/storage
+  diary/model.ts            # DiaryEntry schema (types: daily-card, reading, free)
+  diary/service.ts          # Diary CRUD and archive/unarchive
+  readings/service.ts       # Reading workflow (uses AI provider)
+  readings/combination-model.ts    # CardCombination schema (AI-generated meanings)
+  readings/interpretation-model.ts # UserInterpretation schema (reading sessions)
+  readings/practice-question-model.ts   # PracticeQuestion schema
+  readings/practice-question-service.ts # Practice question CRUD
+  readings/quota.ts         # Reading quota management (per-plan limits)
+  ai/provider.ts            # AIProvider interface (interpretation, reflection, feedback)
+  ai/mock-provider.ts       # Mock AI provider for development
   storage/s3.ts             # S3/MinIO wrapper (upload, delete, validate, processCardImage)
+  html/sanitize.ts          # HTML sanitization (sanitize-html)
+  html/strip.ts             # Strip HTML tags to plain text
 types/
   next-auth.d.ts            # Session type augmentation (profileSlug, permissions)
 ```
@@ -105,13 +142,21 @@ types/
 
 ## Current state
 
-Foundation + Profiles/Permissions + Dashboard Layout + Decks/Cards/Annotations complete:
+Core platform complete with daily card, readings, diary, and admin features:
 
-- **Design system:** Ivory & Charcoal palette, Geist font, shadcn/ui (base-nova)
+- **Design system:** Ivory & Charcoal palette, Geist + Playfair Display fonts, shadcn/ui (base-nova)
 - **Auth:** Email/password + Google OAuth, JWT sessions with cached permissions
 - **Profiles & Permissions:** Role-based (admin, free_tier), admin CRUD
-- **Plans:** CRUD with price in cents, linked to profiles (billing integration pending)
+- **Plans & Subscriptions:** Plan CRUD with price in cents, subscription management (billing integration pending)
 - **Dashboard:** Sidebar with sections (nav, conta, admin accordion), header with page title, mobile overlay
 - **Decks & Cards:** Admin CRUD with image upload to MinIO, configurable aspect ratio per deck, image crop on upload
 - **Annotations:** Interactive annotations on cards — admin click-to-place editor, public viewer with SVG lines (desktop) and numbered dots (mobile)
-- **Stub pages:** Leituras, Cursos, Meu Perfil, Configurações ("Em breve")
+- **Carta do Dia:** Daily card draw (one per user per day, São Paulo timezone), reflection, history with date navigation
+- **Leituras:** Reading wizard with AI interpretation, practice mode with feedback, card combinations, per-plan quota
+- **Diário Espiritual:** Journal entries (types: daily-card, reading, free), pagination, archive/unarchive
+- **Perfil:** User profile management (name, avatar, birth date)
+- **Planos:** Plans listing page
+- **AI integration:** Provider interface with mock implementation for development
+- **Rich text:** TipTap editor/viewer with HTML sanitization
+- **Admin extras:** Practice question CRUD, card combination review, user management
+- **Stub pages:** Cursos, Configurações ("Em breve")
