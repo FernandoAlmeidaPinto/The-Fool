@@ -3,6 +3,7 @@ import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { redirect, notFound } from "next/navigation";
 import { getInterpretationById, getCombinationById } from "@/lib/readings/service";
+import { findEntryFor } from "@/lib/diary/service";
 import { getDeckById } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
 import { RichTextViewer } from "@/components/ui/rich-text-viewer";
@@ -44,6 +45,28 @@ export default async function ReadingResultPage({ params }: Props) {
   });
 
   const aspectRatio = parseAspectRatio(deck.cardAspectRatio).cssValue;
+
+  // Diary CTA — only for normal readings, and only if user has diary:write
+  let diaryCta: { href: string; label: string } | null = null;
+  if (
+    interpretation.mode === "normal" &&
+    hasPermission(session, PERMISSIONS.DIARY_WRITE)
+  ) {
+    const existingEntry = await findEntryFor(session.user.id, {
+      interpretationId: interpretation._id.toString(),
+    });
+    if (existingEntry) {
+      diaryCta = {
+        href: `/diario/${existingEntry._id.toString()}`,
+        label: "Ver minha reflexão",
+      };
+    } else {
+      diaryCta = {
+        href: `/diario/nova?tipo=leitura&ref=${interpretation._id.toString()}`,
+        label: "Escrever no diário",
+      };
+    }
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -160,6 +183,17 @@ export default async function ReadingResultPage({ params }: Props) {
             </div>
           </div>
         </>
+      )}
+
+      {diaryCta && (
+        <div className="text-center pt-4 border-t border-border">
+          <Link
+            href={diaryCta.href}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            {diaryCta.label}
+          </Link>
+        </div>
       )}
     </div>
   );
