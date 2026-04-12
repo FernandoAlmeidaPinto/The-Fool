@@ -1,10 +1,11 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { getByDate, resolveLiveCard } from "@/lib/daily-card/service";
-import { DailyCardView } from "@/components/daily-card/card-view";
+import { splitReflection } from "@/lib/daily-card/reflection";
+import { EditorialLayout } from "@/components/daily-card/editorial-layout";
+import { parseAspectRatio } from "@/lib/decks/constants";
 
 export default async function HistoricoDetailPage({
   params,
@@ -26,32 +27,31 @@ export default async function HistoricoDetailPage({
   const live = await resolveLiveCard(dailyCard);
   const name = live?.card.title ?? dailyCard.cardSnapshot.name;
   const imageUrl = live?.card.image ?? dailyCard.cardSnapshot.imageUrl;
-  const reflection = live ? live.card.dailyReflection : null;
-  const aspectRatio = live?.deck.cardAspectRatio ?? "2/3";
+  const reflectionHtml = live ? live.card.dailyReflection : null;
+  const aspectRatio = parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue;
 
-  // Parse the YYYY-MM-DD as a São Paulo date and format it in pt-BR.
-  // Appending T12:00:00 avoids any timezone-shift surprises for dateLabel.
-  const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  // Multi-line editorial date. T12:00:00 avoids midnight-UTC off-by-one.
+  const dateObj = new Date(`${date}T12:00:00`);
+  const dateWeekday = dateObj.toLocaleDateString("pt-BR", { weekday: "long" });
+  const dateDayMonth = dateObj
+    .toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })
+    .toUpperCase();
+  const dateYear = `DE ${dateObj.getFullYear()}`;
+
+  const { pullQuote, firstLetter, bodyWithoutFirstLetter } =
+    splitReflection(reflectionHtml);
 
   return (
-    <div className="space-y-8">
-      <DailyCardView
-        name={name}
-        imageUrl={imageUrl}
-        reflection={reflection}
-        aspectRatio={aspectRatio}
-        dateLabel={dateLabel}
-        size="compact"
-      />
-      <div className="text-center">
-        <Link href="/carta-do-dia/historico" className="text-sm text-primary hover:underline">
-          ← Voltar ao histórico
-        </Link>
-      </div>
-    </div>
+    <EditorialLayout
+      name={name}
+      imageUrl={imageUrl}
+      aspectRatio={aspectRatio}
+      dateWeekday={dateWeekday}
+      dateDayMonth={dateDayMonth}
+      dateYear={dateYear}
+      pullQuote={pullQuote}
+      firstLetter={firstLetter}
+      bodyWithoutFirstLetter={bodyWithoutFirstLetter}
+    />
   );
 }

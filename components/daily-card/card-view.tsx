@@ -19,7 +19,7 @@ export function DailyCardView({
   size = "default",
 }: DailyCardViewProps) {
   const ratio = parseAspectRatio(aspectRatio).cssValue;
-  const imageClass = size === "compact" ? "w-full max-w-[160px]" : "w-full max-w-xs";
+  const imageClass = size === "compact" ? "w-full max-w-[192px]" : "w-full max-w-xs";
   const nameClass =
     size === "compact"
       ? "text-center text-xl font-semibold text-foreground"

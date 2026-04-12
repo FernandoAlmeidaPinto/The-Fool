@@ -52,11 +52,11 @@ export function EditorialLayout({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
         {/* Card column */}
         <div className="lg:col-span-5 lg:self-start">
-          <div className="relative mx-auto w-full max-w-sm">
+          <div className="relative mx-auto w-full max-w-[192px]">
             {/* Decorative block — absolute, insets handle the offset */}
             <div
               aria-hidden
-              className="absolute inset-[-3%_-8%_-2%_4%] z-0 rounded-[2px] bg-foreground/5 sm:inset-[-6%_-15%_-4%_8%]"
+              className="absolute"
             />
             <div
               className="relative z-10 overflow-hidden rounded-lg border border-border shadow-sm"

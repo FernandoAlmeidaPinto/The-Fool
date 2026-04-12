@@ -54,12 +54,12 @@ export default async function HistoricoPage({
       {items.length === 0 ? (
         <p className="text-muted-foreground">Ainda não há cartas no seu histórico.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="flex flex-wrap justify-center gap-4 sm:justify-start">
           {resolved.map(({ dc, name, imageUrl, aspectRatio, dateLabel }) => (
             <Link
               key={dc._id.toString()}
               href={`/carta-do-dia/historico/${dc.date}`}
-              className="group flex flex-col gap-2"
+              className="group flex w-[192px] flex-col gap-2"
             >
               <div className="relative overflow-hidden rounded-md border border-border" style={{ aspectRatio }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
