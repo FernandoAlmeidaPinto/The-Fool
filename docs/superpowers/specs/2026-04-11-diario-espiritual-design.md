@@ -19,7 +19,7 @@ Entries are **immutable** once created (no editing) but can be **archived** (sof
 ### New domain: `lib/diary/`
 
 - `model.ts` — Mongoose model `DiaryEntry`
-- `service.ts` — `createEntry`, `listEntries`, `getEntryById`, `archiveEntry`, `unarchiveEntry`, `hasEntryFor`
+- `service.ts` — `createEntry`, `listEntries`, `getEntryById`, `archiveEntry`, `unarchiveEntry`, `findEntryFor`
 
 ### New routes
 
@@ -40,6 +40,7 @@ Entries are **immutable** once created (no editing) but can be **archived** (sof
 ### Permissions
 
 - New constants `DIARY_READ = "diary:read"` and `DIARY_WRITE = "diary:write"` in `lib/permissions/constants.ts`
+- `diary:write` covers both entry creation and archive/unarchive — a single permission for all write operations, since splitting these into separate permissions adds no practical value for this feature
 - Seed updated so only the `admin` profile includes both. `free_tier` does **not** get them.
 
 ## Data Model
@@ -52,8 +53,8 @@ File: `lib/diary/model.ts`.
 {
   userId: ObjectId;                // ref User
   type: "daily-card" | "reading" | "free";
-  title: string | null;            // optional, user's choice
-  body: string;                    // reflection text (required, non-empty)
+  title: string | null;            // optional, user's choice (max 200 chars)
+  body: string;                    // reflection text (required, non-empty, max 10000 chars)
   dailyCardId: ObjectId | null;    // ref DailyCard, only when type = "daily-card"
   interpretationId: ObjectId | null; // ref UserInterpretation, only when type = "reading"
   archivedAt: Date | null;         // null = active, Date = archived
@@ -64,8 +65,7 @@ File: `lib/diary/model.ts`.
 
 Indexes:
 
-- `{ userId: 1, createdAt: -1 }` — main paginated timeline
-- `{ userId: 1, archivedAt: 1, createdAt: -1 }` — separate active from archived
+- `{ userId: 1, archivedAt: 1, createdAt: -1 }` — paginated timeline filtered by archive status (covers both active and archived queries)
 - `{ userId: 1, dailyCardId: 1 }` — fast lookup "did I already reflect on this daily card?"
 - `{ userId: 1, interpretationId: 1 }` — same for readings
 
@@ -73,7 +73,8 @@ Invariants:
 
 - `dailyCardId` may only be set when `type = "daily-card"`
 - `interpretationId` may only be set when `type = "reading"`
-- `body` must be a non-empty string
+- `body` must be a non-empty string, max 10,000 characters
+- `title` max 200 characters when provided
 - Entries are immutable after creation — `title` and `body` are never updated
 - The only mutable field is `archivedAt` (archive / unarchive)
 
@@ -114,10 +115,10 @@ File: `lib/diary/service.ts`.
 - Sets `archivedAt = null`
 - Returns the updated entry
 
-### `hasEntryFor(userId, { dailyCardId?, interpretationId? })`
+### `findEntryFor(userId, { dailyCardId?, interpretationId? })`
 
-- Returns `boolean` — "does a diary entry already exist for this daily card / reading?"
-- Used by the Carta do Dia and Leituras pages to toggle between "Escrever no diário" and "Ver minha reflexão" CTAs
+- Returns `DiaryEntry | null` — finds the existing diary entry for a given daily card or reading
+- Used by the Carta do Dia and Leituras pages to toggle between "Escrever no diário" and "Ver minha reflexão" CTAs — the returned `_id` is needed to construct the link to `/diario/[id]`
 
 No AI involvement anywhere. The service is pure CRUD + validation.
 
