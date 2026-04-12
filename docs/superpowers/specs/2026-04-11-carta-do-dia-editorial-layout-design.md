@@ -144,7 +144,7 @@ export function splitReflection(html: string | null): SplitReflection;
 
 1. If `html` is null or empty after trim → return `{ pullQuote: null, body: null, firstLetter: null, bodyWithoutFirstLetter: null }`.
 2. Strip HTML tags with `html.replace(/<[^>]+>/g, " ")`, collapse whitespace with `.replace(/\s+/g, " ").trim()`. The space substitution avoids gluing words together across paragraph boundaries.
-3. Split on the first sentence boundary using a regex that matches a period followed by whitespace: `/(?<=\.)\s+/`. Take the first chunk as `pullQuote` (trimmed). Join the remaining chunks with a single space as the `body` (trimmed).
+3. Split on the first sentence boundary using a regex that matches a period followed by whitespace: `/(?<=\.)\s+/`. Take the first chunk as `pullQuote` (trimmed). Join the remaining chunks with a single space as the `body` (trimmed). Note: this is intentionally naive — it will also split on abbreviations ("Sr. Fulano"). The current AI-generated content doesn't produce such patterns, so don't engineer around it; if a real case appears, revisit then.
 4. If the split yields only one chunk (no period found, or period only at the very end), `body` is `""`.
 5. For `firstLetter`: scan `body` from the left, find the first character matching `/\p{L}/u`, take it. If no such character exists (body is empty or only punctuation), `firstLetter` is `null`.
 6. `bodyWithoutFirstLetter` is `body` with exactly that first letter removed (from its found index, not from position 0).
@@ -173,8 +173,7 @@ If rich body rendering becomes a requirement later, the function becomes more co
 
 Positioned absolutely inside the card column, behind the image:
 
-- **Size:** width 85% of column, height 90% of image height
-- **Offset:** `top: 8%`, `left: 8%` (desktop); `top: 4%`, `left: 4%` (mobile)
+- **Sizing approach:** the card column wraps the image in an inner `<div>` that is `position: relative` and whose size is driven by the image itself (natural flow). Inside that wrapper, the decorative block is `position: absolute` with `inset: -6% -15% -4% 8%` on desktop and `inset: -3% -8% -2% 4%` on mobile — expressing the offsets as insets instead of size-plus-offset avoids the "percentage height on absolute child needs parent height" trap. The resulting block extends beyond the image bottom-right and sits slightly inset top-left, producing the intended passe-partout offset effect.
 - **Style:** `bg-charcoal/5` (charcoal at 5% opacity) over the ivory background — an almost-imperceptible passe-partout
 - **Border radius:** 2px — nearly square, editorial
 - **Z-index:** block has `z-0`, image has `z-10`
@@ -294,7 +293,7 @@ interface EditorialLayoutProps {
   dateYear: string;
   pullQuote: string | null;
   firstLetter: string | null;
-  bodyRest: string | null;
+  bodyWithoutFirstLetter: string | null;
 }
 ```
 
