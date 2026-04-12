@@ -14,6 +14,7 @@ import {
   Crown,
   MessageCircleQuestionMark,
   Sun,
+  NotebookPen,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { SidebarSection } from "./sidebar-section";
@@ -45,6 +46,9 @@ export function SidebarContent({ session, onNavigate }: SidebarContentProps) {
         <SidebarItem href="/" label="Dashboard" icon={LayoutDashboard} onNavigate={onNavigate} />
         <SidebarItem href="/leituras" label="Leituras" icon={Sparkles} onNavigate={onNavigate} />
         <SidebarItem href="/carta-do-dia" label="Carta do Dia" icon={Sun} onNavigate={onNavigate} />
+        {permissions.includes("diary:read") && (
+          <SidebarItem href="/diario" label="Diário" icon={NotebookPen} onNavigate={onNavigate} />
+        )}
         <SidebarItem href="/cursos" label="Cursos" icon={BookOpen} onNavigate={onNavigate} />
         <SidebarItem href="/baralhos" label="Baralhos" icon={Layers} onNavigate={onNavigate} />
       </nav>
