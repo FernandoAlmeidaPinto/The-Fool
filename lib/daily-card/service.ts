@@ -114,6 +114,13 @@ export async function getByDate(
   return DailyCard.findOne({ userId, date }).lean();
 }
 
+export async function getDailyCardById(
+  dailyCardId: string
+): Promise<IDailyCard | null> {
+  await connectDB();
+  return DailyCard.findById(dailyCardId).lean();
+}
+
 /**
  * Resolves the live card (deck + subdoc) for a stored DailyCard record.
  * Returns null if either the deck or the card no longer exists — in that

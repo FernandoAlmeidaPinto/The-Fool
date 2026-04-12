@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { getEntryById } from "@/lib/diary/service";
-import { getByDate, resolveLiveCard } from "@/lib/daily-card/service";
+import { getDailyCardById, resolveLiveCard } from "@/lib/daily-card/service";
 import { getInterpretationById } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
@@ -51,13 +51,9 @@ export default async function DiaryEntryPage({ params }: Props) {
   let linkedContext: React.ReactNode = null;
 
   if (entry.type === "daily-card" && entry.dailyCardId) {
-    // Fetch DailyCard by id — getByDate needs a date. Use findById approach via service.
-    // The service's getEntryById already verifies ownership. We need to fetch the DailyCard doc.
-    // We'll use the daily-card model's getDailyCardById via a direct approach:
-    const { connectDB } = await import("@/lib/db/mongoose");
-    const { DailyCard } = await import("@/lib/daily-card/model");
-    await connectDB();
-    const dc = await DailyCard.findById(entry.dailyCardId).lean();
+    // Ownership is guaranteed: the diary entry itself is userId-scoped (getEntryById filters by userId),
+    // and the dailyCardId was validated at entry creation time.
+    const dc = await getDailyCardById(entry.dailyCardId.toString());
 
     if (dc) {
       const live = await resolveLiveCard(dc);

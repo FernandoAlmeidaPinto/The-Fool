@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, ArchiveRestore } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,38 +17,49 @@ interface ArchiveButtonProps {
 export function ArchiveButton({ entryId, isArchived }: ArchiveButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const handleClick = () => {
+    setError(null);
     startTransition(async () => {
-      if (isArchived) {
-        await unarchiveDiaryEntryAction(entryId);
-        router.push("/diario");
-      } else {
-        await archiveDiaryEntryAction(entryId);
-        router.push("/diario");
+      const action = isArchived
+        ? unarchiveDiaryEntryAction
+        : archiveDiaryEntryAction;
+      const result = await action(entryId);
+
+      if ("error" in result) {
+        setError(result.error);
+        return;
       }
+
+      router.push(isArchived ? "/diario/arquivadas" : "/diario");
     });
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleClick}
-      disabled={isPending}
-      className="gap-2"
-    >
-      {isArchived ? (
-        <>
-          <ArchiveRestore className="h-4 w-4" />
-          {isPending ? "Restaurando..." : "Restaurar"}
-        </>
-      ) : (
-        <>
-          <Archive className="h-4 w-4" />
-          {isPending ? "Arquivando..." : "Arquivar"}
-        </>
+    <div className="flex items-center gap-3">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleClick}
+        disabled={isPending}
+        className="gap-2"
+      >
+        {isArchived ? (
+          <>
+            <ArchiveRestore className="h-4 w-4" />
+            {isPending ? "Restaurando..." : "Restaurar"}
+          </>
+        ) : (
+          <>
+            <Archive className="h-4 w-4" />
+            {isPending ? "Arquivando..." : "Arquivar"}
+          </>
+        )}
+      </Button>
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
       )}
-    </Button>
+    </div>
   );
 }

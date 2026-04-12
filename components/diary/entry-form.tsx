@@ -45,7 +45,7 @@ const TYPE_META: Record<
   },
   reading: {
     label: "Leitura",
-    description: "Revisit uma leitura anterior",
+    description: "Reflita sobre uma leitura anterior",
     icon: <Sparkles className="h-6 w-6" />,
     placeholder: "O que mudou desde essa leitura?",
   },
