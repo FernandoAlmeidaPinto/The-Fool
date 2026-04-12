@@ -18,6 +18,10 @@ export const PERMISSIONS = {
 
   // Daily card
   DAILY_CARD_READ: "daily-card:read",
+
+  // Diary
+  DIARY_READ: "diary:read",
+  DIARY_WRITE: "diary:write",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
