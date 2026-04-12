@@ -8,7 +8,9 @@ import {
   markRevealed,
   resolveLiveCard,
 } from "@/lib/daily-card/service";
-import { DailyCardView } from "@/components/daily-card/card-view";
+import { splitReflection } from "@/lib/daily-card/reflection";
+import { EditorialLayout } from "@/components/daily-card/editorial-layout";
+import { parseAspectRatio } from "@/lib/decks/constants";
 import { Button } from "@/components/ui/button";
 
 export default async function CartaDoDiaPage() {
@@ -40,25 +42,32 @@ export default async function CartaDoDiaPage() {
   const live = await resolveLiveCard(dailyCard);
   const name = live?.card.title ?? dailyCard.cardSnapshot.name;
   const imageUrl = live?.card.image ?? dailyCard.cardSnapshot.imageUrl;
-  const reflection = live?.card.dailyReflection ?? null;
-  const aspectRatio = live?.deck.cardAspectRatio ?? "2/3";
+  const reflectionHtml = live?.card.dailyReflection ?? null;
+  const aspectRatio = parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue;
+
+  // Multi-line editorial date. The T12:00:00 suffix avoids the midnight-UTC
+  // off-by-one that happens when a YYYY-MM-DD string is parsed at UTC.
+  const dateObj = new Date(`${dailyCard.date}T12:00:00`);
+  const dateWeekday = dateObj.toLocaleDateString("pt-BR", { weekday: "long" });
+  const dateDayMonth = dateObj
+    .toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })
+    .toUpperCase();
+  const dateYear = `DE ${dateObj.getFullYear()}`;
+
+  const { pullQuote, firstLetter, bodyWithoutFirstLetter } =
+    splitReflection(reflectionHtml);
 
   return (
-    <div className="space-y-8">
-      <DailyCardView
-        name={name}
-        imageUrl={imageUrl}
-        reflection={reflection}
-        aspectRatio={aspectRatio}
-      />
-      <div className="text-center">
-        <Link
-          href="/carta-do-dia/historico"
-          className="text-sm text-primary hover:underline"
-        >
-          Ver histórico
-        </Link>
-      </div>
-    </div>
+    <EditorialLayout
+      name={name}
+      imageUrl={imageUrl}
+      aspectRatio={aspectRatio}
+      dateWeekday={dateWeekday}
+      dateDayMonth={dateDayMonth}
+      dateYear={dateYear}
+      pullQuote={pullQuote}
+      firstLetter={firstLetter}
+      bodyWithoutFirstLetter={bodyWithoutFirstLetter}
+    />
   );
 }
