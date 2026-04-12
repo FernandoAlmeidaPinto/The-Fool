@@ -1,13 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-
-function getInitialState(storageKey: string, defaultOpen: boolean): boolean {
-  if (typeof window === "undefined") return defaultOpen;
-  const stored = localStorage.getItem(storageKey);
-  return stored !== null ? stored === "true" : defaultOpen;
-}
 
 interface SidebarSectionProps {
   label: string;
@@ -22,7 +16,14 @@ export function SidebarSection({
   defaultOpen = false,
   children,
 }: SidebarSectionProps) {
-  const [isOpen, setIsOpen] = useState(() => getInitialState(storageKey, defaultOpen));
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(storageKey);
+    if (stored !== null) {
+      setIsOpen(stored === "true");
+    }
+  }, [storageKey]);
 
   function toggle() {
     const next = !isOpen;

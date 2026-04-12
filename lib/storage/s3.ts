@@ -9,6 +9,7 @@ import {
 
 const endpoint = process.env.S3_ENDPOINT!;
 const bucket = process.env.S3_BUCKET!;
+const isR2 = Boolean(process.env.S3_R2);
 
 const s3 = new S3Client({
   endpoint,
@@ -20,7 +21,18 @@ const s3 = new S3Client({
   forcePathStyle: true,
 });
 
+export function getS3Client() {
+  return s3;
+}
+
+export function getS3Bucket() {
+  return bucket;
+}
+
 async function ensureBucket() {
+  // R2 buckets are pre-created; skip auto-provisioning.
+  if (isR2) return;
+
   try {
     await s3.send(new HeadBucketCommand({ Bucket: bucket }));
   } catch {
@@ -103,5 +115,10 @@ export async function deleteFile(key: string): Promise<void> {
 }
 
 export function getPublicUrl(key: string): string {
+  if (isR2) {
+    // Serve via API proxy route (R2 requires authenticated access)
+    return `/api/storage/${key}`;
+  }
+  // Local MinIO (path-style, publicly accessible)
   return `${endpoint}/${bucket}/${key}`;
 }

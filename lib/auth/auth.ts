@@ -23,6 +23,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/auth/login",
   },
+  events: {
+    async createUser({ user }) {
+      // Assign free_tier profile to OAuth-created users (Credentials users
+      // get their profile in the register() action instead).
+      await connectDB();
+      const { Profile } = await import("@/lib/profiles/model");
+      const freeTier = await Profile.findOne({ slug: "free_tier" });
+      if (freeTier) {
+        await User.findByIdAndUpdate(user.id, { profileId: freeTier._id });
+      }
+    },
+  },
   providers: [
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
