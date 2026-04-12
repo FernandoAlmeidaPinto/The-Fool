@@ -45,6 +45,7 @@ export default async function HistoricoDetailPage({
         reflection={reflection}
         aspectRatio={aspectRatio}
         dateLabel={dateLabel}
+        size="compact"
       />
       <div className="text-center">
         <Link href="/carta-do-dia/historico" className="text-sm text-primary hover:underline">
