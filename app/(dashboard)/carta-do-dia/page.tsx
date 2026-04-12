@@ -9,6 +9,7 @@ import {
   resolveLiveCard,
 } from "@/lib/daily-card/service";
 import { splitReflection } from "@/lib/daily-card/reflection";
+import { findEntryFor } from "@/lib/diary/service";
 import { EditorialLayout } from "@/components/daily-card/editorial-layout";
 import { parseAspectRatio } from "@/lib/decks/constants";
 import { Button } from "@/components/ui/button";
@@ -57,17 +58,48 @@ export default async function CartaDoDiaPage() {
   const { pullQuote, firstLetter, bodyWithoutFirstLetter } =
     splitReflection(reflectionHtml);
 
+  // Diary CTA — only if user has diary:write permission
+  let diaryCta: { href: string; label: string } | null = null;
+  if (hasPermission(session, PERMISSIONS.DIARY_WRITE)) {
+    const existingEntry = await findEntryFor(userId, {
+      dailyCardId: dailyCard._id.toString(),
+    });
+    if (existingEntry) {
+      diaryCta = {
+        href: `/diario/${existingEntry._id.toString()}`,
+        label: "Ver minha reflexão",
+      };
+    } else {
+      diaryCta = {
+        href: `/diario/nova?tipo=carta-do-dia&ref=${dailyCard.date}`,
+        label: "Escrever no diário",
+      };
+    }
+  }
+
   return (
-    <EditorialLayout
-      name={name}
-      imageUrl={imageUrl}
-      aspectRatio={aspectRatio}
-      dateWeekday={dateWeekday}
-      dateDayMonth={dateDayMonth}
-      dateYear={dateYear}
-      pullQuote={pullQuote}
-      firstLetter={firstLetter}
-      bodyWithoutFirstLetter={bodyWithoutFirstLetter}
-    />
+    <>
+      <EditorialLayout
+        name={name}
+        imageUrl={imageUrl}
+        aspectRatio={aspectRatio}
+        dateWeekday={dateWeekday}
+        dateDayMonth={dateDayMonth}
+        dateYear={dateYear}
+        pullQuote={pullQuote}
+        firstLetter={firstLetter}
+        bodyWithoutFirstLetter={bodyWithoutFirstLetter}
+      />
+      {diaryCta && (
+        <div className="mx-auto mt-6 max-w-2xl text-center">
+          <Link
+            href={diaryCta.href}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            {diaryCta.label}
+          </Link>
+        </div>
+      )}
+    </>
   );
 }
