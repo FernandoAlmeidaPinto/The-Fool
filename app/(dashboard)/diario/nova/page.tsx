@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
-import { getHistory, resolveLiveCard } from "@/lib/daily-card/service";
+import { getHistory, getByDate, resolveLiveCard } from "@/lib/daily-card/service";
 import { findEntryFor } from "@/lib/diary/service";
 import { listUserInterpretations } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
@@ -36,12 +36,9 @@ export default async function NovaDiarioPage({
   // Resolve preselected reference for daily-card type
   if (preselectedType === "daily-card" && ref) {
     // ref is a YYYY-MM-DD date — find the DailyCard for that date
-    const { items } = await getHistory(userId, { page: 1, pageSize: 1 });
-    // Try to find exact match by searching history
-    const { items: allItems } = await getHistory(userId, { page: 1, pageSize: 30 });
-    const match = allItems.find((dc) => dc.date === ref);
-    if (match) {
-      preselectedDailyCardId = match._id.toString();
+    const dc = await getByDate(userId, ref);
+    if (dc) {
+      preselectedDailyCardId = dc._id.toString();
     }
   }
 
