@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ImageCropUpload } from "@/components/image-crop-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { updateCardAction } from "../../../../actions";
+import { getImageUrl } from "@/lib/storage/s3";
 
 export default async function EditCardPage({
   params,
@@ -61,7 +62,7 @@ export default async function EditCardPage({
           <ImageCropUpload
             name="image"
             aspectRatio={numericRatio}
-            currentImage={card.image}
+            currentImage={getImageUrl(card.image)}
             label="Imagem da Carta"
           />
           <Button type="submit">Salvar Alterações</Button>

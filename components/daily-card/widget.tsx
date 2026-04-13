@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/check";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { getOrCreateToday, resolveLiveCard } from "@/lib/daily-card/service";
+import { getImageUrl } from "@/lib/storage/s3";
 
 export async function DailyCardWidget() {
   const session = await auth();
@@ -24,7 +25,7 @@ export async function DailyCardWidget() {
 
   const live = await resolveLiveCard(dailyCard);
   const name = live?.card.title ?? dailyCard.cardSnapshot.name;
-  const imageUrl = live?.card.image ?? dailyCard.cardSnapshot.imageUrl;
+  const imageUrl = getImageUrl(live?.card.image ?? dailyCard.cardSnapshot.imageUrl)!;
   const visited = dailyCard.revealedAt !== null;
 
   return (

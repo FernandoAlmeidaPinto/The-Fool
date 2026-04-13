@@ -14,6 +14,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CardThumbnail } from "@/components/card-thumbnail";
 import Link from "next/link";
 import { updateDeckAction, setAsDailyDeckAction } from "../../actions";
+import { getImageUrl } from "@/lib/storage/s3";
 
 export default async function EditDeckPage({
   params,
@@ -71,7 +72,7 @@ export default async function EditDeckPage({
             <div className="space-y-2">
               <Label htmlFor="coverImage">Imagem de Capa (opcional)</Label>
               {deck.coverImage && (
-                <img src={deck.coverImage} alt="Capa atual" className="w-32 rounded-md border border-border" />
+                <img src={getImageUrl(deck.coverImage)!} alt="Capa atual" className="w-32 rounded-md border border-border" />
               )}
               <Input id="coverImage" name="coverImage" type="file" accept="image/jpeg,image/png,image/webp" />
               <p className="text-xs text-muted-foreground">
@@ -131,7 +132,7 @@ export default async function EditDeckPage({
                 key={card._id.toString()}
                 href={`/admin/decks/${deck._id}/cards/${card._id}/edit`}
                 title={card.title}
-                image={card.image ?? null}
+                image={getImageUrl(card.image)}
                 aspectRatio={parseAspectRatio(deck.cardAspectRatio).cssValue}
               />
             ))}

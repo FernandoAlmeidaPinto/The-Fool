@@ -8,6 +8,7 @@ import { getHistory, getByDate, resolveLiveCard } from "@/lib/daily-card/service
 import { findEntryFor } from "@/lib/diary/service";
 import { listUserInterpretations } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
+import { getImageUrl } from "@/lib/storage/s3";
 import { EntryForm } from "@/components/diary/entry-form";
 import type { DailyCardOption, ReadingOption } from "@/components/diary/entry-form";
 import type { DiaryEntryType } from "@/lib/diary/model";
@@ -64,7 +65,7 @@ export default async function NovaDiarioPage({
         year: "numeric",
       }),
       cardName: live?.card.title ?? dc.cardSnapshot.name,
-      cardImage: live?.card.image ?? dc.cardSnapshot.imageUrl,
+      cardImage: getImageUrl(live?.card.image ?? dc.cardSnapshot.imageUrl)!,
     });
   }
 

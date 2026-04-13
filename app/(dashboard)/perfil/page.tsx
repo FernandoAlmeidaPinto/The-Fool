@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserById } from "@/lib/users/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { getActiveSubscription } from "@/lib/subscriptions/service";
+import { getImageUrl } from "@/lib/storage/s3";
 import { ProfileForm } from "@/components/profile/profile-form";
 
 export default async function PerfilPage() {
@@ -49,7 +50,7 @@ export default async function PerfilPage() {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          avatar: user.avatar ?? null,
+          avatar: getImageUrl(user.avatar) ?? null,
           birthDate: birthDateStr,
         }}
         plan={{

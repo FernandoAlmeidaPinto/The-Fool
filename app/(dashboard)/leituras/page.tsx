@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { listUserInterpretations } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
+import { getImageUrl } from "@/lib/storage/s3";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -99,8 +100,8 @@ export default async function LeiturasPage({ searchParams }: Props) {
                 (c) => c._id.toString() === cardId.toString()
               );
               return card
-                ? { _id: card._id.toString(), title: card.title, image: card.image }
-                : { _id: cardId.toString(), title: "?", image: "" };
+                ? { _id: card._id.toString(), title: card.title, image: getImageUrl(card.image) }
+                : { _id: cardId.toString(), title: "?", image: null };
             });
 
             return (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listDecks } from "@/lib/decks/service";
 import { DECK_TYPE_LABELS, DeckType } from "@/lib/decks/constants";
 import { Badge } from "@/components/ui/badge";
+import { getImageUrl } from "@/lib/storage/s3";
 
 export default async function BaralhosPage() {
   const decks = await listDecks();
@@ -15,7 +16,7 @@ export default async function BaralhosPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {decks.map((deck) => {
-            const coverSrc = deck.coverImage ?? deck.cards[0]?.image ?? null;
+            const coverSrc = getImageUrl(deck.coverImage ?? deck.cards[0]?.image);
 
             return (
               <Link

@@ -9,6 +9,7 @@ import { getDailyCardById, resolveLiveCard } from "@/lib/daily-card/service";
 import { getInterpretationById } from "@/lib/readings/service";
 import { getDeckById } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 import { ArchiveButton } from "./archive-button";
 import type { DiaryEntryType } from "@/lib/diary/model";
 
@@ -58,7 +59,7 @@ export default async function DiaryEntryPage({ params }: Props) {
     if (dc) {
       const live = await resolveLiveCard(dc);
       const cardName = live?.card.title ?? dc.cardSnapshot.name;
-      const cardImage = live?.card.image ?? dc.cardSnapshot.imageUrl;
+      const cardImage = getImageUrl(live?.card.image ?? dc.cardSnapshot.imageUrl)!;
       const aspectRatio = parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue;
 
       linkedContext = (

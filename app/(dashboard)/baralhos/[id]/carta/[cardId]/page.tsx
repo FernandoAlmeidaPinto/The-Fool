@@ -5,6 +5,7 @@ import { getCardFromDeck } from "@/lib/decks/service";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getImageUrl } from "@/lib/storage/s3";
 
 interface Props {
   params: Promise<{ id: string; cardId: string }>;
@@ -61,7 +62,7 @@ export default async function CardDetailPage({ params }: Props) {
         )}
         {hasAnnotations ? (
           <CardAnnotationsViewer
-            image={card.image!}
+            image={getImageUrl(card.image)!}
             aspectRatio={parseAspectRatio(deck.cardAspectRatio).cssValue}
             annotations={annotations}
           />
@@ -74,7 +75,7 @@ export default async function CardDetailPage({ params }: Props) {
           >
             {card.image ? (
               <img
-                src={card.image}
+                src={getImageUrl(card.image)!}
                 alt={card.title}
                 className="object-contain w-full h-full"
               />

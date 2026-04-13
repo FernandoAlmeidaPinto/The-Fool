@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { listDecks } from "@/lib/decks/service";
 import { checkReadingQuota } from "@/lib/readings/quota";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 import { NewReadingWizard } from "@/components/readings/new-reading-wizard";
 import type { DeckForWizard } from "@/components/readings/new-reading-wizard";
 
@@ -27,14 +28,14 @@ export default async function NovaLeituraPage() {
     _id: deck._id.toString(),
     name: deck.name,
     type: deck.type,
-    coverImage: deck.coverImage ?? deck.cards[0]?.image ?? null,
+    coverImage: getImageUrl(deck.coverImage ?? deck.cards[0]?.image),
     cardAspectRatio: parseAspectRatio(deck.cardAspectRatio).cssValue,
     cards: [...deck.cards]
       .sort((a, b) => a.order - b.order)
       .map((card) => ({
         _id: card._id.toString(),
         title: card.title,
-        image: card.image,
+        image: getImageUrl(card.image) ?? "",
       })),
   }));
 

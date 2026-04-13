@@ -6,6 +6,7 @@ import { getInterpretationById, getCombinationById } from "@/lib/readings/servic
 import { findEntryFor } from "@/lib/diary/service";
 import { getDeckById } from "@/lib/decks/service";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 import { RichTextViewer } from "@/components/ui/rich-text-viewer";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
@@ -40,8 +41,8 @@ export default async function ReadingResultPage({ params }: Props) {
   const cards = interpretation.cardIds.map((cardId) => {
     const card = deck.cards.find((c) => c._id.toString() === cardId.toString());
     return card
-      ? { _id: card._id.toString(), title: card.title, image: card.image }
-      : { _id: cardId.toString(), title: "Carta removida", image: "" };
+      ? { _id: card._id.toString(), title: card.title, image: getImageUrl(card.image) }
+      : { _id: cardId.toString(), title: "Carta removida", image: null };
   });
 
   const aspectRatio = parseAspectRatio(deck.cardAspectRatio).cssValue;

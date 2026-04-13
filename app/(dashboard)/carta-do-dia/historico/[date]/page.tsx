@@ -6,6 +6,7 @@ import { getByDate, resolveLiveCard } from "@/lib/daily-card/service";
 import { splitReflection } from "@/lib/daily-card/reflection";
 import { EditorialLayout } from "@/components/daily-card/editorial-layout";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 
 export default async function HistoricoDetailPage({
   params,
@@ -26,7 +27,7 @@ export default async function HistoricoDetailPage({
 
   const live = await resolveLiveCard(dailyCard);
   const name = live?.card.title ?? dailyCard.cardSnapshot.name;
-  const imageUrl = live?.card.image ?? dailyCard.cardSnapshot.imageUrl;
+  const imageUrl = getImageUrl(live?.card.image ?? dailyCard.cardSnapshot.imageUrl)!;
   const reflectionHtml = live ? live.card.dailyReflection : null;
   const aspectRatio = parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue;
 

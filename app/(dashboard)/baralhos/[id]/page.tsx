@@ -4,6 +4,7 @@ import { DECK_TYPE_LABELS, DeckType, parseAspectRatio } from "@/lib/decks/consta
 import { Badge } from "@/components/ui/badge";
 import { CardThumbnail } from "@/components/card-thumbnail";
 import { RichTextViewer } from "@/components/ui/rich-text-viewer";
+import { getImageUrl } from "@/lib/storage/s3";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -40,7 +41,7 @@ export default async function DeckPage({ params }: Props) {
               key={card._id.toString()}
               href={`/baralhos/${id}/carta/${card._id.toString()}`}
               title={card.title}
-              image={card.image ?? null}
+              image={getImageUrl(card.image)}
               aspectRatio={parseAspectRatio(deck.cardAspectRatio).cssValue}
             />
           ))}

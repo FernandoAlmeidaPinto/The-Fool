@@ -12,6 +12,7 @@ import { splitReflection } from "@/lib/daily-card/reflection";
 import { findEntryFor } from "@/lib/diary/service";
 import { EditorialLayout } from "@/components/daily-card/editorial-layout";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 import { Button } from "@/components/ui/button";
 
 export default async function CartaDoDiaPage() {
@@ -42,7 +43,7 @@ export default async function CartaDoDiaPage() {
 
   const live = await resolveLiveCard(dailyCard);
   const name = live?.card.title ?? dailyCard.cardSnapshot.name;
-  const imageUrl = live?.card.image ?? dailyCard.cardSnapshot.imageUrl;
+  const imageUrl = getImageUrl(live?.card.image ?? dailyCard.cardSnapshot.imageUrl)!;
   const reflectionHtml = live?.card.dailyReflection ?? null;
   const aspectRatio = parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue;
 

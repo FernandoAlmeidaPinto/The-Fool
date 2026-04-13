@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import { getDeckById, getCardFromDeck } from "@/lib/decks/service";
 import Link from "next/link";
 import { AnnotationEditor } from "@/components/admin/annotation-editor";
+import { getImageUrl } from "@/lib/storage/s3";
 import {
   createAnnotationAction,
   updateAnnotationAction,
@@ -56,7 +57,7 @@ export default async function AnnotationsPage({
       <AnnotationEditor
         deckId={id}
         cardId={cardId}
-        cardImage={card.image}
+        cardImage={getImageUrl(card.image)!}
         cardAspectRatio={deck.cardAspectRatio}
         initialAnnotations={serializedAnnotations}
         createAction={createAnnotationAction}

@@ -6,6 +6,7 @@ import { PERMISSIONS } from "@/lib/permissions/constants";
 import { getHistory, resolveLiveCard } from "@/lib/daily-card/service";
 import { Button } from "@/components/ui/button";
 import { parseAspectRatio } from "@/lib/decks/constants";
+import { getImageUrl } from "@/lib/storage/s3";
 
 const PAGE_SIZE = 30;
 
@@ -31,7 +32,7 @@ export default async function HistoricoPage({
       return {
         dc,
         name: live?.card.title ?? dc.cardSnapshot.name,
-        imageUrl: live?.card.image ?? dc.cardSnapshot.imageUrl,
+        imageUrl: getImageUrl(live?.card.image ?? dc.cardSnapshot.imageUrl)!,
         aspectRatio: parseAspectRatio(live?.deck.cardAspectRatio ?? "2/3").cssValue,
         dateLabel: new Date(`${dc.date}T12:00:00`).toLocaleDateString("pt-BR", {
           day: "2-digit",

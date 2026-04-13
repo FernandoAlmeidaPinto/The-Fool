@@ -102,7 +102,7 @@ export async function uploadFile(
       ContentType: contentType,
     })
   );
-  return getPublicUrl(key);
+  return key;
 }
 
 export async function deleteFile(key: string): Promise<void> {
@@ -114,11 +114,12 @@ export async function deleteFile(key: string): Promise<void> {
   );
 }
 
-export function getPublicUrl(key: string): string {
-  if (isR2) {
-    // Serve via API proxy route (R2 requires authenticated access)
-    return `/api/storage/${key}`;
-  }
-  // Local MinIO (path-style, publicly accessible)
-  return `${endpoint}/${bucket}/${key}`;
+/**
+ * Resolve a storage key to a URL for rendering in `<img src>`.
+ * Always routes through the API proxy so images are never exposed publicly.
+ * Returns null if the key is falsy.
+ */
+export function getImageUrl(key: string | null | undefined): string | null {
+  if (!key) return null;
+  return `/api/storage/${key}`;
 }
