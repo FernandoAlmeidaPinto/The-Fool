@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { toast } from "react-toastify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,30 @@ import {
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(loginWithCredentials, null);
+  const toastId = useRef<ReturnType<typeof toast.loading> | null>(null);
+  const prevPending = useRef(false);
+
+  useEffect(() => {
+    if (pending && !prevPending.current) {
+      toastId.current = toast.loading("Entrando...");
+    }
+
+    if (!pending && prevPending.current && toastId.current !== null) {
+      if (state?.error) {
+        toast.update(toastId.current, {
+          render: state.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+      } else {
+        toast.dismiss(toastId.current);
+      }
+      toastId.current = null;
+    }
+
+    prevPending.current = pending;
+  }, [pending, state]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
@@ -30,9 +55,6 @@ export default function LoginPage() {
               <Label htmlFor="password">Senha</Label>
               <Input id="password" name="password" type="password" required />
             </div>
-            {state?.error && (
-              <p className="text-sm text-destructive">{state.error}</p>
-            )}
             <Button type="submit" className="w-full" disabled={pending}>
               {pending ? "Entrando..." : "Entrar"}
             </Button>

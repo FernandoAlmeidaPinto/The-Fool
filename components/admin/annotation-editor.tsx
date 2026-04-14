@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useTransition, useCallback } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,10 +109,13 @@ export function AnnotationEditor({
                 )
               );
             }
+            toast.success("Posição atualizada!");
             setMode("editing");
             setPendingCoords(null);
           } catch (err) {
-            setError(err instanceof Error ? err.message : "Erro ao reposicionar");
+            const msg = err instanceof Error ? err.message : "Erro ao reposicionar";
+            toast.error(msg);
+            setError(msg);
           }
         });
       }
@@ -135,6 +139,7 @@ export function AnnotationEditor({
 
   const handleCreate = useCallback(() => {
     if (!pendingCoords || !title.trim()) return;
+    const toastId = toast.loading("Criando anotação...");
     startTransition(async () => {
       try {
         setError(null);
@@ -157,18 +162,32 @@ export function AnnotationEditor({
           };
           setAnnotations((prev) => [...prev, newAnnotation]);
         }
+        toast.update(toastId, {
+          render: "Anotação criada!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         setMode("idle");
         setPendingCoords(null);
         setTitle("");
         setDescription("");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao criar anotação");
+        const msg = err instanceof Error ? err.message : "Erro ao criar anotação";
+        toast.update(toastId, {
+          render: msg,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+        setError(msg);
       }
     });
   }, [pendingCoords, title, description, deckId, cardId, createAction]);
 
   const handleUpdate = useCallback(() => {
     if (!selectedId || !title.trim()) return;
+    const toastId = toast.loading("Salvando alterações...");
     startTransition(async () => {
       try {
         setError(null);
@@ -188,12 +207,25 @@ export function AnnotationEditor({
             )
           );
         }
+        toast.update(toastId, {
+          render: "Anotação atualizada!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         setMode("idle");
         setSelectedId(null);
         setTitle("");
         setDescription("");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao atualizar anotação");
+        const msg = err instanceof Error ? err.message : "Erro ao atualizar anotação";
+        toast.update(toastId, {
+          render: msg,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+        setError(msg);
       }
     });
   }, [selectedId, title, description, deckId, cardId, updateAction]);
@@ -201,17 +233,31 @@ export function AnnotationEditor({
   const handleDelete = useCallback(() => {
     if (!selectedId) return;
     if (!confirm("Tem certeza que deseja remover esta anotação?")) return;
+    const toastId = toast.loading("Removendo anotação...");
     startTransition(async () => {
       try {
         setError(null);
         await deleteAction({ deckId, cardId, annotationId: selectedId });
         setAnnotations((prev) => prev.filter((a) => a._id !== selectedId));
+        toast.update(toastId, {
+          render: "Anotação removida!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         setMode("idle");
         setSelectedId(null);
         setTitle("");
         setDescription("");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao remover anotação");
+        const msg = err instanceof Error ? err.message : "Erro ao remover anotação";
+        toast.update(toastId, {
+          render: msg,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+        setError(msg);
       }
     });
   }, [selectedId, deckId, cardId, deleteAction]);

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Sun, Sparkles, Feather } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,7 +96,6 @@ export function EntryForm({
   );
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const handleSelectType = (type: EntryType) => {
     setSelectedType(type);
@@ -115,8 +115,9 @@ export function EntryForm({
   const handleSubmit = () => {
     if (!body.trim()) return;
 
+    const toastId = toast.loading("Salvando reflexão...");
+
     startTransition(async () => {
-      setError(null);
       const result = await createDiaryEntryAction({
         type: selectedType,
         title: title.trim() || undefined,
@@ -126,8 +127,19 @@ export function EntryForm({
       });
 
       if ("error" in result) {
-        setError(result.error);
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
       } else {
+        toast.update(toastId, {
+          render: "Reflexão salva com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         router.push("/diario");
       }
     });
@@ -137,12 +149,6 @@ export function EntryForm({
 
   return (
     <div>
-      {error && (
-        <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {error}
-        </div>
-      )}
-
       {/* Step 1: Type Selection */}
       {step === "type" && (
         <div className="space-y-4">

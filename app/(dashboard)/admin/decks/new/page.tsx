@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { AdminForm } from "@/components/admin/admin-form";
 import { createDeckAction } from "../actions";
 
 export default async function NewDeckPage() {
@@ -25,7 +26,11 @@ export default async function NewDeckPage() {
         <CardTitle>Novo Baralho</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={createDeckAction} className="space-y-4">
+        <AdminForm
+          action={createDeckAction}
+          loadingMessage="Criando baralho..."
+          successMessage="Baralho criado com sucesso!"
+        >
           <div className="space-y-2">
             <Label htmlFor="name">Nome</Label>
             <Input id="name" name="name" required />
@@ -56,7 +61,7 @@ export default async function NewDeckPage() {
             <p className="text-xs text-muted-foreground">Se não informada, usa a imagem da primeira carta.</p>
           </div>
           <Button type="submit">Criar Baralho</Button>
-        </form>
+        </AdminForm>
       </CardContent>
     </Card>
   );

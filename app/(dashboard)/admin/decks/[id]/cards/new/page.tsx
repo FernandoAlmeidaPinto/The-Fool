@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ImageCropUpload } from "@/components/image-crop-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { AdminForm } from "@/components/admin/admin-form";
 import { addCardAction } from "../../../actions";
 
 export default async function NewCardPage({
@@ -36,7 +37,11 @@ export default async function NewCardPage({
         <CardTitle>Adicionar Carta — {deck.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={addCardAction} className="space-y-4">
+        <AdminForm
+          action={addCardAction}
+          loadingMessage="Adicionando carta..."
+          successMessage="Carta adicionada com sucesso!"
+        >
           <input type="hidden" name="deckId" value={id} />
           <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
@@ -52,7 +57,7 @@ export default async function NewCardPage({
             required
           />
           <Button type="submit">Adicionar Carta</Button>
-        </form>
+        </AdminForm>
       </CardContent>
     </Card>
   );

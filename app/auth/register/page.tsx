@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { toast } from "react-toastify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,35 @@ import { register } from "@/lib/auth/auth-actions";
 
 export default function RegisterPage() {
   const [state, formAction, pending] = useActionState(register, null);
+  const toastId = useRef<ReturnType<typeof toast.loading> | null>(null);
+  const prevPending = useRef(false);
+
+  useEffect(() => {
+    if (pending && !prevPending.current) {
+      toastId.current = toast.loading("Cadastrando...");
+    }
+
+    if (!pending && prevPending.current && toastId.current !== null) {
+      if (state?.error) {
+        toast.update(toastId.current, {
+          render: state.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+      } else {
+        toast.update(toastId.current, {
+          render: "Conta criada com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
+      }
+      toastId.current = null;
+    }
+
+    prevPending.current = pending;
+  }, [pending, state]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
@@ -37,9 +67,6 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            {state?.error && (
-              <p className="text-sm text-destructive">{state.error}</p>
-            )}
             <Button type="submit" className="w-full" disabled={pending}>
               {pending ? "Cadastrando..." : "Cadastrar"}
             </Button>

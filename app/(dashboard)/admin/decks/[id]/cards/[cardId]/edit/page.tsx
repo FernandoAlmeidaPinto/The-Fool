@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ImageCropUpload } from "@/components/image-crop-upload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { AdminForm } from "@/components/admin/admin-form";
 import { updateCardAction } from "../../../../actions";
 import { getImageUrl } from "@/lib/storage/s3";
 
@@ -48,7 +49,11 @@ export default async function EditCardPage({
         </Link>
       </CardHeader>
       <CardContent>
-        <form action={updateCardAction} className="space-y-4">
+        <AdminForm
+          action={updateCardAction}
+          loadingMessage="Salvando carta..."
+          successMessage="Carta atualizada com sucesso!"
+        >
           <input type="hidden" name="deckId" value={id} />
           <input type="hidden" name="cardId" value={card._id.toString()} />
           <div className="space-y-2">
@@ -66,7 +71,7 @@ export default async function EditCardPage({
             label="Imagem da Carta"
           />
           <Button type="submit">Salvar Alterações</Button>
-        </form>
+        </AdminForm>
       </CardContent>
     </Card>
   );

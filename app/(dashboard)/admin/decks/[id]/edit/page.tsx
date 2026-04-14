@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { CardThumbnail } from "@/components/card-thumbnail";
+import { AdminForm } from "@/components/admin/admin-form";
 import Link from "next/link";
 import { updateDeckAction, setAsDailyDeckAction } from "../../actions";
 import { getImageUrl } from "@/lib/storage/s3";
@@ -42,7 +43,11 @@ export default async function EditDeckPage({
           <CardTitle>Editar Baralho: {deck.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={updateDeckAction} className="space-y-4">
+          <AdminForm
+            action={updateDeckAction}
+            loadingMessage="Salvando baralho..."
+            successMessage="Baralho atualizado com sucesso!"
+          >
             <input type="hidden" name="id" value={deck._id.toString()} />
             <div className="space-y-2">
               <Label htmlFor="name">Nome</Label>
@@ -80,7 +85,7 @@ export default async function EditDeckPage({
               </p>
             </div>
             <Button type="submit">Salvar Alterações</Button>
-          </form>
+          </AdminForm>
         </CardContent>
       </Card>
 
@@ -89,7 +94,12 @@ export default async function EditDeckPage({
           <CardTitle>Carta do Dia</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={setAsDailyDeckAction} className="flex items-center gap-4">
+          <AdminForm
+            action={setAsDailyDeckAction}
+            loadingMessage={deck.availableForDailyCard ? "Desativando..." : "Ativando..."}
+            successMessage={deck.availableForDailyCard ? "Carta do dia desativada!" : "Carta do dia ativada!"}
+            className="flex items-center gap-4"
+          >
             <input type="hidden" name="deckId" value={deck._id.toString()} />
             <input
               type="hidden"
@@ -109,7 +119,7 @@ export default async function EditDeckPage({
             >
               {deck.availableForDailyCard ? "Desativar" : "Ativar"}
             </Button>
-          </form>
+          </AdminForm>
         </CardContent>
       </Card>
 

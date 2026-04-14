@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { subscribeToPlanAction, cancelSubscriptionAction } from "@/app/(dashboard)/planos/actions";
 import { RichTextViewer } from "@/components/ui/rich-text-viewer";
@@ -35,12 +36,24 @@ export function PlanCard({ plan, isCurrent, hasSubscription }: PlanCardProps) {
   }).format(plan.price / 100);
 
   const handleSubscribe = () => {
+    const toastId = toast.loading("Assinando...");
     startTransition(async () => {
       const result = await subscribeToPlanAction(plan._id);
       if (result.success) {
+        toast.update(toastId, {
+          render: "Assinatura realizada com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         router.refresh();
       } else {
-        alert(result.error);
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
       }
     });
   };
@@ -49,12 +62,24 @@ export function PlanCard({ plan, isCurrent, hasSubscription }: PlanCardProps) {
     if (!confirm("Tem certeza que deseja cancelar sua assinatura? Você voltará para o plano gratuito.")) {
       return;
     }
+    const toastId = toast.loading("Cancelando assinatura...");
     startTransition(async () => {
       const result = await cancelSubscriptionAction();
       if (result.success) {
+        toast.update(toastId, {
+          render: "Assinatura cancelada.",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         router.refresh();
       } else {
-        alert(result.error);
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
       }
     });
   };

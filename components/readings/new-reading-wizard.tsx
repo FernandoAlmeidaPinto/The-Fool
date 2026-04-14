@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { createReadingAction } from "@/app/(dashboard)/leituras/actions";
@@ -68,6 +69,8 @@ export function NewReadingWizard({
   const handleSubmitNormal = () => {
     if (!selectedDeck || selectedCardIds.length < 2 || !context.trim()) return;
 
+    const toastId = toast.loading("Gerando interpretação...");
+
     startTransition(async () => {
       setError(null);
       const result = await createReadingAction({
@@ -77,8 +80,20 @@ export function NewReadingWizard({
       });
 
       if ("error" in result) {
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
         setError(result.error);
       } else {
+        toast.update(toastId, {
+          render: "Leitura gerada com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         router.push(`/leituras/${result.id}`);
       }
     });

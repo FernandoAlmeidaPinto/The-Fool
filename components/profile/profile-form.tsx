@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useTransition, useRef } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,20 +28,29 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user, plan }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const toastId = toast.loading("Salvando perfil...");
 
     startTransition(async () => {
-      setMessage(null);
       const result = await updateProfileAction(formData);
       if (result.success) {
-        setMessage({ type: "success", text: "Perfil atualizado com sucesso" });
+        toast.update(toastId, {
+          render: "Perfil atualizado com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
       } else {
-        setMessage({ type: "error", text: result.error ?? "Erro ao salvar" });
+        toast.update(toastId, {
+          render: result.error ?? "Erro ao salvar",
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
       }
     });
   };
@@ -59,18 +69,6 @@ export function ProfileForm({ user, plan }: ProfileFormProps) {
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-lg border border-border bg-card p-6 space-y-5">
           <h3 className="text-lg font-semibold">Dados Pessoais</h3>
-
-          {message && (
-            <div
-              className={`rounded-md border px-3 py-2 text-sm ${
-                message.type === "success"
-                  ? "border-green-200 bg-green-50 text-green-800"
-                  : "border-destructive/30 bg-destructive/10 text-destructive"
-              }`}
-            >
-              {message.text}
-            </div>
-          )}
 
           {/* Avatar */}
           <div className="flex items-center gap-4">

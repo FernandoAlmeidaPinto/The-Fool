@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Archive, ArchiveRestore } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,10 +18,11 @@ interface ArchiveButtonProps {
 export function ArchiveButton({ entryId, isArchived }: ArchiveButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
 
   const handleClick = () => {
-    setError(null);
+    const label = isArchived ? "Restaurando..." : "Arquivando...";
+    const toastId = toast.loading(label);
+
     startTransition(async () => {
       const action = isArchived
         ? unarchiveDiaryEntryAction
@@ -28,38 +30,44 @@ export function ArchiveButton({ entryId, isArchived }: ArchiveButtonProps) {
       const result = await action(entryId);
 
       if ("error" in result) {
-        setError(result.error);
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
         return;
       }
 
+      toast.update(toastId, {
+        render: isArchived ? "Entrada restaurada!" : "Entrada arquivada!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
       router.push(isArchived ? "/diario/arquivadas" : "/diario");
     });
   };
 
   return (
-    <div className="flex items-center gap-3">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleClick}
-        disabled={isPending}
-        className="gap-2"
-      >
-        {isArchived ? (
-          <>
-            <ArchiveRestore className="h-4 w-4" />
-            {isPending ? "Restaurando..." : "Restaurar"}
-          </>
-        ) : (
-          <>
-            <Archive className="h-4 w-4" />
-            {isPending ? "Arquivando..." : "Arquivar"}
-          </>
-        )}
-      </Button>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleClick}
+      disabled={isPending}
+      className="gap-2"
+    >
+      {isArchived ? (
+        <>
+          <ArchiveRestore className="h-4 w-4" />
+          {isPending ? "Restaurando..." : "Restaurar"}
+        </>
+      ) : (
+        <>
+          <Archive className="h-4 w-4" />
+          {isPending ? "Arquivando..." : "Arquivar"}
+        </>
       )}
-    </div>
+    </Button>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { stripHtml } from "@/lib/html/strip";
@@ -49,6 +50,7 @@ export function CombinationReviewList({
   };
 
   const handleSave = (combinationId: string) => {
+    const toastId = toast.loading("Salvando revisão...");
     startTransition(async () => {
       setError(null);
       const wasEdited = editedAnswer !== originalAnswer;
@@ -59,8 +61,21 @@ export function CombinationReviewList({
       });
 
       if (!result.success) {
-        setError(result.error ?? "Erro ao salvar");
+        const msg = result.error ?? "Erro ao salvar";
+        toast.update(toastId, {
+          render: msg,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
+        setError(msg);
       } else {
+        toast.update(toastId, {
+          render: "Combinação revisada!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         setExpandedId(null);
       }
     });

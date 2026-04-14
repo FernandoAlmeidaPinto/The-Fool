@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -99,6 +100,8 @@ export function PracticeStep({
   const handleSubmit = () => {
     if (!questionText.trim() || !userAnswer.trim()) return;
 
+    const toastId = toast.loading("Enviando resposta...");
+
     startSubmitTransition(async () => {
       setError(null);
       const result = await createPracticeAttemptAction({
@@ -109,8 +112,20 @@ export function PracticeStep({
       });
 
       if ("error" in result) {
+        toast.update(toastId, {
+          render: result.error,
+          type: "error",
+          isLoading: false,
+          autoClose: 4000,
+        });
         setError(result.error);
       } else {
+        toast.update(toastId, {
+          render: "Resposta enviada com sucesso!",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000,
+        });
         router.push(`/leituras/${result.id}`);
       }
     });
